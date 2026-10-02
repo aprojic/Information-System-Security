@@ -1,0 +1,12 @@
+# Tajne i generirani artefakti — NIKAD u repo
+.env
+**/.env
+_lab-env/flaggen/out/
+**/KEY*.csv
+**/out/
+# Generirano iz uputa (PDF/HTML žive na Merlinu)
+*.pdf
+# Snimke, Python cache
+*.cast
+__pycache__/
+*.pyc

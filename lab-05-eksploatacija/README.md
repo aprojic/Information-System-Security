@@ -1,0 +1,97 @@
+<!-- kicker: Lab 05 · attack then defend · Information System Security -->
+# Lab 05 — Exploitation & Privilege Escalation
+
+*From a weak password to root in three steps. It's rarely a brilliant exploit — more often a weak password and one bad configuration.*
+
+`~90 min` · `Kali · nmap · hydra · SSH` · `level: intermediate` · `submit: Merlin`
+
+> [!WARNING]
+> **Ethics & scope.** Only against this deliberately vulnerable target in the lab environment. Dictionary attacks and escalation against real systems without written permission are a criminal offence.
+
+**Scenario.** Flicker has a forgotten server on the network. You're first the **attacker** who cracks a weak password, gets in and becomes root, then the **administrator** who closes every step of that chain.
+
+## Learning outcomes
+
+- Discover a service and run a dictionary attack against its login.
+- Gain access and enumerate privilege-escalation options.
+- Exploit a sudo misconfiguration to get root and read a protected flag.
+- Explain how each step of the chain is prevented.
+
+## Prerequisites
+
+- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali + Docker working.
+- [ ] Tools `nmap`, `hydra`, `ssh` (present on Kali).
+- [ ] Linux basics and the concept of SUID/sudo.
+
+## Setup · ~10 min
+
+Copy `.env.example` to `.env` and set **your student ID** and `ISS_SECRET` (from the instructor), then build the target:
+
+```bash
+cp .env.example .env     # edit: MB=<your student ID>, ISS_SECRET=<from instructor>
+docker compose up -d --build
+```
+
+The SSH target listens on `localhost:2222`. A small password list `passwords.txt` is included. The flag in `/root/flag.txt` is derived from your student ID — so it's yours.
+
+## Part 1 — Offensive: from password to root · ~45 min
+
+### 1.1 Discover the service
+```bash
+nmap -sV -p 2222 localhost
+```
+> [!NOTE]
+> **Expected.** Port `2222` open, service OpenSSH.
+
+### 1.2 Dictionary attack on the login
+The user is `flicker`. Crack the password with the targeted list:
+```bash
+hydra -l flicker -P passwords.txt -s 2222 ssh://localhost
+```
+> [!TIP]
+> **Common pitfall.** Attacking over the network is slow — that's why you use a small, targeted list, not all of rockyou. If hydra reports more than one hit, verify with `ssh`.
+
+### 1.3 Get in and enumerate
+```bash
+ssh flicker@localhost -p 2222
+sudo -l
+```
+> [!NOTE]
+> **Expected.** `sudo -l` shows that `flicker` may run one program as root without a password (`NOPASSWD`).
+
+### 1.4 Escalate to root
+That program (see [GTFOBins](https://gtfobins.github.io/)) can spawn a shell. Use it to get a root shell and read `/root/flag.txt`.
+
+**In the report:** the cracked password, the `sudo -l` output, the command you used to get root, the contents of `/root/flag.txt`, and `id` showing `uid=0(root)`.
+
+## Part 2 — Defensive: close the chain · ~30 min
+
+### 2.1 Why each step worked
+For each step (weak password → SSH → sudo misconfig) explain in one sentence why it succeeded.
+
+### 2.2 The fix
+**In the report:**
+- **Login:** SSH keys instead of passwords (or strong passwords + `fail2ban` + rate-limiting).
+- **Privileges:** remove `NOPASSWD` and never allow shell-spawning programs via `sudo`; least privilege.
+- **Monitoring:** log `sudo`/logins and alert.
+
+### 2.3 Recommendations
+3 concrete recommendations for Flicker, ordered by impact.
+
+### Bonus
+- Perform the same access via Metasploit (`ssh_login` module) and compare with hydra.
+- Write a minimal correct `sudoers` line that still gives `flicker` the needed function but no path to root.
+
+## Submission
+
+- `lab05_<ID>.pdf` — the whole chain with outputs, `/root/flag.txt`, `id` as root, defensive write-up.
+
+## Grading
+
+| Item | Points |
+|---|:-:|
+| Service discovery + cracked password | 3 |
+| Escalation to root + flag read | 3 |
+| Defence for each step of the chain | 3 |
+| Recommendations by impact | 1 |
+| Bonus | +1 |

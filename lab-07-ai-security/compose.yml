@@ -1,0 +1,27 @@
+# Lab 07 — meta: lokalni ranjivi LLM chatbot (SecureBot) + Ollama.
+# Prije pokretanja: kopiraj .env.example u .env i upiši ISS_SECRET (daje nastavnik).
+# Pokretanje (u Kaliju):
+#   docker compose up -d --build
+#   docker compose exec ollama ollama pull llama3.2:1b   # jednom; ~1.3 GB
+#   → http://localhost:5000  (upiši svoj matični broj u sučelju)
+# Dio 2 (obrana): GUARDRAIL: "on", pa: docker compose up -d
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+  securebot:
+    build: ./app
+    environment:
+      ISS_SECRET: "${ISS_SECRET:?postavi ISS_SECRET u .env}"
+      MODEL: "llama3.2:1b"
+      GUARDRAIL: "off"
+      OLLAMA_URL: "http://ollama:11434"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - ollama
+    restart: unless-stopped
+volumes:
+  ollama:

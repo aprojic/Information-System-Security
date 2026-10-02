@@ -1,0 +1,13 @@
+# Lab 05 — meta se gradi iz Dockerfilea (ranjivi SSH + sudo misconfig).
+# Prije: kopiraj .env.example u .env, upiši SVOJ matični broj i ISS_SECRET (nastavnik).
+# Pokretanje (u Kaliju):  docker compose up -d --build   →  SSH na localhost:2222
+# Zaustavljanje:          docker compose down
+services:
+  target:
+    build: .
+    environment:
+      MB: "${MB:?postavi svoj matični broj u .env}"
+      ISS_SECRET: "${ISS_SECRET:?postavi ISS_SECRET u .env}"
+    ports:
+      - "2222:22"
+    restart: unless-stopped

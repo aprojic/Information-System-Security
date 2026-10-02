@@ -1,0 +1,9 @@
+# Lab 02 — meta: DVWA preko običnog HTTP-a (za presretanje prijave).
+# Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:4280  (admin / password)
+# Zaustavljanje:          docker compose down
+services:
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    ports:
+      - "4280:4280"
+    restart: unless-stopped

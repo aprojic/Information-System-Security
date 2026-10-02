@@ -1,0 +1,10 @@
+# Lab 03 — meta: DVWA (SQL injection + XSS).
+# Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:4280  (admin / password)
+#   U DVWA-u: Create/Reset Database, pa DVWA Security postavi na "Low" (kasnije "Medium").
+# Zaustavljanje:          docker compose down
+services:
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    ports:
+      - "4280:4280"
+    restart: unless-stopped

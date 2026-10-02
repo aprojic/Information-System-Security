@@ -1,0 +1,10 @@
+# Lab 06 — meta za CTF dio: OWASP Juice Shop.
+# Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:3000
+# Zaustavljanje:          docker compose down
+# incident.log (plavi tim) je u ovoj mapi / na Merlinu — ne treba Docker.
+services:
+  juiceshop:
+    image: bkimminich/juice-shop:latest
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
