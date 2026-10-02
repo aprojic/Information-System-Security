@@ -44,9 +44,10 @@ A copied flag won't match your student ID, so it won't count. Full student guide
 
 ## 📁 What's inside
 
-- `lab-NN-*/` — each lab: `README.md` (instructions) + its `compose.yml` / target files.
+- `lab-NN-*/` — each lab: `README.md` (English) and `README.hr.md` (Croatian) instructions + its `compose.yml` / target files. The README is the single source: GitHub renders it, and `tools/build-pdf.sh lab-NN/README.md` produces the styled Merlin PDF from the same file.
 - `_lab-env/` — the shared flag tooling: `flaglib.py` (flag formula), `flaggen/checker.py` (instructor answer key over the class roster), `flaggen/gen.py` (Lab 01 hash files). See [`_lab-env/README.md`](_lab-env/README.md).
-- `*/.env.example` — copy to `.env` and fill in; the real `.env` and answer keys are **git-ignored** and never published.
+- `tools/` — `build-pdf.sh` + `ghmd2styled.py` + `handout.css` turn a lab README into the Merlin PDF (needs `apex`, Chrome, `python3`).
+- `*/.env.example` — copy to `.env` and fill in; the real `.env`, PDFs and answer keys are **git-ignored** and never published.
 
 ## 📜 License
 

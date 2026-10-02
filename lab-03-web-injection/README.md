@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 03 · attack then defend · Information System Security -->
 # Lab 03 — Web Attacks I: Injection & XSS
 

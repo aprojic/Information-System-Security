@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 06 · capstone · red & blue team · Information System Security -->
 # Lab 06 — Attack and Investigate (Capstone)
 

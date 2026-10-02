@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 00 · setup · Information System Security -->
 # Lab 00 — Set up your lab
 

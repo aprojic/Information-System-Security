@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 05 · attack then defend · Information System Security -->
 # Lab 05 — Exploitation & Privilege Escalation
 

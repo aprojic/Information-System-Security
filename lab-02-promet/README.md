@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 02 · attack then defend · Information System Security -->
 # Lab 02 — Network Traffic: Interception & Detection
 

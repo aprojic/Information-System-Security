@@ -1,3 +1,5 @@
+**Language:** English · [Hrvatski](README.hr.md)
+
 <!-- kicker: Lab 07 · attack then defend · Information System Security -->
 # Lab 07 — AI Security: Prompt Injection
 
