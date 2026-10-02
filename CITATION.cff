@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use or adapt these lab materials, please cite them as below."
+title: "Information System Security: hands-on offensive & defensive labs"
+abstract: >-
+  Lab instructions and environment for the course Information System Security
+  (Sigurnost informacijskih sustava) at Aspira University of Applied Sciences,
+  Split. Each lab pairs an offensive technique with a defensive fix: password
+  hashing and cracking, network traffic interception and detection, web attacks
+  (injection, XSS, broken access control, JWT), exploitation and privilege
+  escalation, a red/blue capstone, and AI security (prompt injection) — run on
+  Kali Linux with Docker targets.
+authors:
+  - family-names: Projić
+    given-names: Ante
+    orcid: "https://orcid.org/0009-0009-1673-7270"
+    affiliation: "Aspira University of Applied Sciences (Veleučilište Aspira), Split"
+license: CC-BY-4.0
+repository-code: "https://github.com/aprojic/Information-System-Security"
+date-released: 2026-10-02
+keywords:
+  - information security
+  - teaching materials
+  - offensive security
+  - defensive security
+  - kali linux
+  - docker
+  - owasp

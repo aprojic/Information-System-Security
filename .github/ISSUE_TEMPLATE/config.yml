@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Grades, submissions or deadlines
+    url: https://moodle.srce.hr
+    about: Ask on Merlin or by email, not here. Issues are public.

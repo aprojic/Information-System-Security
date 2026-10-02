@@ -1,0 +1,27 @@
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 5 * * 1" # every Monday morning, before class: catch links that died during the week
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: Links in the lab instructions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-retries 3 --accept 200,206,429
+            --exclude 'localhost' --exclude '127\.0\.0\.1' --exclude 'flicker\.test'
+            --exclude-path LICENSE --exclude-path LICENSE-CODE
+            './**/*.md'
+          fail: true
