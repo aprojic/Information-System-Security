@@ -22,6 +22,7 @@ jobs:
           args: >-
             --no-progress --max-retries 3 --accept 200,206,429
             --exclude 'localhost' --exclude '127\.0\.0\.1' --exclude 'flicker\.test'
+            --exclude 'asciinema\.org'
             --exclude-path LICENSE --exclude-path LICENSE-CODE
             './**/*.md'
           fail: true
