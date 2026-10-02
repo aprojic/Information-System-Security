@@ -1,0 +1,33 @@
+name: Typo or unclear step
+description: Something in the instructions is wrong, outdated or hard to follow.
+title: "[Docs] "
+labels: [docs]
+body:
+  - type: dropdown
+    id: lab
+    attributes:
+      label: Which lab?
+      options:
+        - Lab 00 — Setup
+        - Lab 01 — Hashing
+        - Lab 02 — Network traffic
+        - Lab 03 — Injection & XSS
+        - Lab 04 — Auth & access
+        - Lab 05 — Exploitation & privesc
+        - Lab 06 — Capstone
+        - Lab 07 — AI security
+        - README
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where exactly?
+      placeholder: "e.g. Part 2, step 2.3"
+  - type: textarea
+    id: what
+    attributes:
+      label: What's wrong, and what would be better?
+    validations:
+      required: true
