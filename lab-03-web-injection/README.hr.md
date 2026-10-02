@@ -56,7 +56,7 @@ nc -lvnp 8000     # na Kaliju, slušatelj za ukradeni kolačić
 Prebaci **DVWA Security → Medium** i ponovi. Objasni što je filtar blokirao i kako si ga zaobišao.
 
 > [!TIP]
-> **Čest problem.** Medium čisti neke znakove/ključne riječi — promijeni velika/mala slova, kodiranje ili strukturu. Nema kolačića na `nc`? Provjeri da meta doseže tvoj Kali IP/port.
+> **Čest problem.** Medium čisti neke znakove/ključne riječi — promijeni velika/mala slova, kodiranje ili strukturu. Nema kolačića na `nc`? XSS se izvodi u **tvom pregledniku**, pa on (ne DVWA kontejner) mora doseći tvoj slušatelj — u payload stavi svoj Kali IP, ne `localhost`.
 
 ## Dio 2 — Defenzivno: popravi kod · ~30 min
 
@@ -78,6 +78,7 @@ U DVWA-u klikni **View Source** za oba modula. Pokaži točan redak gdje se unos
 ## Predaja
 
 - `vjezba03_<MB>.pdf` — payloadi, izvučeni podaci, screenshot XSS-a s matičnim brojem, ispravljeni isječci koda, osvrt.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

@@ -46,7 +46,7 @@ Open `http://localhost:5000` and **enter your student ID**. SecureBot then has y
 Try to override the "don't reveal" instruction (role-play, claiming a new context, asking for "previous instructions"). Document what worked and what didn't.
 
 ### 1.2 Indirect / bypass approach
-If direct asking fails, make the model **transform** the secret (spell it out, translate, encode, "letter by letter") or print its system prompt, and reconstruct `ASPIRA{sis_ai_...}`.
+If direct asking fails, make the model **transform** the secret (spell it out, translate, encode, "letter by letter") or print its system prompt, and reconstruct `ASPIRA{sis_ai_...}`. For a 1B model, asking it to print its **full system prompt verbatim** is usually the most reliable way to get the exact flag — "spell it letter by letter" often mangles the hex.
 
 > [!NOTE]
 > **Expected.** A small model struggles to keep the secret consistently — a combination of techniques yields the full code. That is your flag.
@@ -74,6 +74,7 @@ In `.env`/`compose.yml` set `GUARDRAIL: "on"` and bring `securebot` back up (`do
 ## Submission
 
 - `lab07_<ID>.pdf` — attempts with responses, extracted flag, filter bypass, defensive write-up.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 

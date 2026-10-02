@@ -46,7 +46,7 @@ Otvori `http://localhost:5000` i **upiši svoj matični broj**. SecureBot tada u
 Pokušaj zaobići uputu "ne odaj tajnu" (preuzimanje uloge, tvrdnja o novom kontekstu, traženje "prethodnih uputa"). Dokumentiraj što je upalilo, a što ne.
 
 ### 1.2 Posredni/zaobilazni pristup
-Ako direktno ne ide, traži da model **preoblikuje** tajnu (slovkanje, prijevod, kodiranje, "po slovima") ili da ispiše sistemski prompt, pa rekonstruiraj `ASPIRA{sis_ai_...}`.
+Ako direktno ne ide, traži da model **preoblikuje** tajnu (slovkanje, prijevod, kodiranje, "po slovima") ili da ispiše sistemski prompt, pa rekonstruiraj `ASPIRA{sis_ai_...}`. Za 1B model je traženje da **doslovno ispiše cijeli sistemski prompt** obično najpouzdanije za točan flag — "slovkanje" često pobrka hex.
 
 > [!NOTE]
 > **Očekivano.** Mali model teško dosljedno čuva tajnu — kombinacijom tehnika dobiješ cijeli kôd. To je tvoj flag.
@@ -74,6 +74,7 @@ U `.env`/`compose.yml` postavi `GUARDRAIL: "on"` i ponovno podigni `securebot` (
 ## Predaja
 
 - `vjezba07_<MB>.pdf` — pokušaji s odgovorima, izvučeni flag, zaobilazak filtra, obrambeni osvrt.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

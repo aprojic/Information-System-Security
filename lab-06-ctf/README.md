@@ -78,6 +78,7 @@ Briefly (5–7 sentences): **containment, eradication, recovery**, and what woul
 ## Submission
 
 - `lab06_<ID>.pdf` — CTF challenges + Score Board screenshot, incident analysis (phases, IOCs, flag, response plan).
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 

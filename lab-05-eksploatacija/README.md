@@ -48,7 +48,7 @@ nmap -sV -p 2222 localhost
 ### 1.2 Dictionary attack on the login
 The user is `flicker`. Crack the password with the targeted list:
 ```bash
-hydra -l flicker -P passwords.txt -s 2222 ssh://localhost
+hydra -l flicker -P passwords.txt -t 4 -s 2222 ssh://localhost
 ```
 > [!TIP]
 > **Common pitfall.** Attacking over the network is slow — that's why you use a small, targeted list, not all of rockyou. If hydra reports more than one hit, verify with `ssh`.
@@ -87,6 +87,7 @@ For each step (weak password → SSH → sudo misconfig) explain in one sentence
 ## Submission
 
 - `lab05_<ID>.pdf` — the whole chain with outputs, `/root/flag.txt`, `id` as root, defensive write-up.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 

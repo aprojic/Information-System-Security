@@ -7,7 +7,7 @@
 # Dio 2 (obrana): GUARDRAIL: "on", pa: docker compose up -d
 services:
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.35.0
     volumes:
       - ollama:/root/.ollama
     restart: unless-stopped
@@ -16,7 +16,7 @@ services:
     environment:
       ISS_SECRET: "${ISS_SECRET:?postavi ISS_SECRET u .env}"
       MODEL: "llama3.2:1b"
-      GUARDRAIL: "off"
+      GUARDRAIL: "${GUARDRAIL:-off}"
       OLLAMA_URL: "http://ollama:11434"
     ports:
       - "5000:5000"

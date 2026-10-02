@@ -54,7 +54,7 @@ curl "http://localhost:4280/?student=<ID>"
 
 ### 1.3 Scan the target
 ```bash
-nmap -sS -p 1-1000 localhost
+sudo nmap -sS -p 1-1000 localhost
 ```
 
 > [!TIP]
@@ -86,6 +86,7 @@ Briefly (3–5 sentences): why **TLS** would make the login from 1.1 unreadable,
 
 - `lab02_<ID>.pdf` — screenshots of the interception and the ID packet, the `tshark` count output, the defensive write-up.
 - The capture `cap.pcapng` (or an excerpt).
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 
