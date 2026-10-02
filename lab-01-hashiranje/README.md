@@ -51,7 +51,7 @@ hashcat -m 0 -a 0 hashes_<ID>.txt /usr/share/wordlists/rockyou.txt --show
 ```
 
 > [!NOTE]
-> **Expected.** The three MD5 hashes fall almost instantly. hashcat ignores the bcrypt hash here (it isn't mode 0).
+> **Expected.** The three MD5 hashes fall almost instantly. hashcat ignores the bcrypt hash here (it isn't mode 0); you may see a `Token length exception` for that line — expected, it's the bcrypt hash being skipped.
 
 ### 1.3 Mask attack on your personal FLAG
 
@@ -97,7 +97,7 @@ Briefly (3–5 sentences), using your measurements, explain the **salt** (defeat
 ## Submission
 
 - `lab01_<ID>.pdf` — report with both tables, your flag, the speed comparison, the defensive write-up.
-- Process log (`hashcat --show` output or an `asciinema` recording).
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab01.cast`, stop with `Ctrl-D`) — required; also include the `hashcat --show` output in the report.
 
 ## Grading
 

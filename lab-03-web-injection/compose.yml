@@ -6,5 +6,5 @@ services:
   dvwa:
     image: ghcr.io/digininja/dvwa:latest
     ports:
-      - "4280:4280"
+      - "4280:80"
     restart: unless-stopped

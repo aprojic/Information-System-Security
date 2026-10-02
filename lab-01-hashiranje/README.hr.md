@@ -51,7 +51,7 @@ hashcat -m 0 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt --show
 ```
 
 > [!NOTE]
-> **Očekivano.** Tri MD5 hasha pucaju gotovo trenutno. hashcat ovdje ignorira bcrypt hash (nije mode 0).
+> **Očekivano.** Tri MD5 hasha pucaju gotovo trenutno. hashcat ovdje ignorira bcrypt hash (nije mode 0); za taj redak može javiti `Token length exception` — to je u redu, bcrypt se preskače.
 
 ### 1.3 Mask napad na osobni FLAG
 
@@ -97,7 +97,7 @@ Kratko (3–5 rečenica), koristeći svoja mjerenja, objasni **sol** (onemoguću
 ## Predaja
 
 - `vjezba01_<MB>.pdf` — izvještaj s objema tablicama, flagom, usporedbom brzina, obrambenim osvrtom.
-- Log procesa (`hashcat --show` izlaz ili `asciinema` snimka).
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba01.cast`, zaustavi s `Ctrl-D`) — obavezna; `hashcat --show` izlaz uključi u izvještaj.
 
 ## Bodovanje
 

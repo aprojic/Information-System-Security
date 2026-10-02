@@ -54,7 +54,7 @@ curl "http://localhost:4280/?student=<MB>"
 
 ### 1.3 Skeniranje mete
 ```bash
-nmap -sS -p 1-1000 localhost
+sudo nmap -sS -p 1-1000 localhost
 ```
 
 > [!TIP]
@@ -86,6 +86,7 @@ Kratko (3–5 rečenica): zašto bi **TLS** učinio prijavu iz 1.1 nečitljivom,
 
 - `vjezba02_<MB>.pdf` — screenshotovi presretanja i paketa s matičnim brojem, izlaz `tshark` brojanja, obrambeni osvrt.
 - Snimka `cap.pcapng` (ili isječak).
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

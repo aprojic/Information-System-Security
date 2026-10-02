@@ -48,7 +48,7 @@ nmap -sV -p 2222 localhost
 ### 1.2 Dictionary napad na prijavu
 Korisnik je `flicker`. Probij lozinku ciljanom listom:
 ```bash
-hydra -l flicker -P passwords.txt -s 2222 ssh://localhost
+hydra -l flicker -P passwords.txt -t 4 -s 2222 ssh://localhost
 ```
 > [!TIP]
 > **Čest problem.** Napad preko mreže je spor — zato koristiš malu, ciljanu listu, ne cijeli rockyou. Ako hydra javi više pogodaka, provjeri ručno sa `ssh`.
@@ -87,6 +87,7 @@ Za svaki korak (slaba lozinka → SSH → sudo misconfig) objasni u jednoj reče
 ## Predaja
 
 - `vjezba05_<MB>.pdf` — cijeli lanac s izlazima, `/root/flag.txt`, `id` kao root, obrambeni osvrt.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

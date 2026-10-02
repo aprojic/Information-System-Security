@@ -56,7 +56,7 @@ nc -lvnp 8000     # on Kali, listener for the stolen cookie
 Switch **DVWA Security → Medium** and repeat. Explain what the filter blocked and how you bypassed it.
 
 > [!TIP]
-> **Common pitfall.** Medium strips some characters/keywords — change case, encoding or structure. No cookie at `nc`? Check the target can reach your Kali IP/port.
+> **Common pitfall.** Medium strips some characters/keywords — change case, encoding or structure. No cookie at `nc`? The XSS runs in **your browser**, so it (not the DVWA container) must reach your listener — put your Kali IP, not `localhost`, in the payload.
 
 ## Part 2 — Defensive: fix the code · ~30 min
 
@@ -78,6 +78,7 @@ In DVWA click **View Source** for both modules. Point to the exact line where in
 ## Submission
 
 - `lab03_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, write-up.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 

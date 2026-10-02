@@ -61,7 +61,7 @@ What to explain and the concrete mitigation.
 ## Submission
 
 - `labNN_<ID>.pdf` — report with your flag and the required steps.
-- Process log (`asciinema` recording or a timestamped command history).
+- An **[asciinema](https://asciinema.org/) recording** of your work — the proof of work (required).
 
 ## Grading
 

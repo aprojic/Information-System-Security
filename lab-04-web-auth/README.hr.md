@@ -72,6 +72,7 @@ Objasni (3–5 rečenica) zašto IDOR radi (autorizacija se oslanja na klijentsk
 ## Predaja
 
 - `vjezba04_<MB>.pdf` — nalazi, dekodirani JWT, screenshot Score Boarda s tvojim računom, obrambeni osvrt.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

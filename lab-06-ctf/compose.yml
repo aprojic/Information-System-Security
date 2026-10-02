@@ -4,7 +4,7 @@
 # incident.log (plavi tim) je u ovoj mapi / na Merlinu — ne treba Docker.
 services:
   juiceshop:
-    image: bkimminich/juice-shop:latest
+    image: bkimminich/juice-shop:v20.2.0
     ports:
       - "3000:3000"
     restart: unless-stopped
