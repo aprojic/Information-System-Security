@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 06 · capstone · red & blue team · Information System Security -->
-# Lab 06 — Attack and Investigate (Capstone)
+<!-- kicker: Lab 07 · capstone · red & blue team · Information System Security -->
+# Lab 07 — Attack and Investigate (Capstone)
 
 *Put it all together: first break into the shop as the red team, then reconstruct someone else's attack from the logs as the blue team.*
 
@@ -77,7 +77,7 @@ Briefly (5–7 sentences): **containment, eradication, recovery**, and what woul
 
 ## Submission
 
-- `lab06_<ID>.pdf` — CTF challenges + Score Board screenshot, incident analysis (phases, IOCs, flag, response plan).
+- `lab07_<ID>.pdf` — CTF challenges + Score Board screenshot, incident analysis (phases, IOCs, flag, response plan).
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading

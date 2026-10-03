@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 05 · napadni pa obrani · Sigurnost informacijskih sustava -->
-# Vježba 05 — Eksploatacija i eskalacija privilegija
+<!-- kicker: Vježba 06 · napadni pa obrani · Sigurnost informacijskih sustava -->
+# Vježba 06 — Eksploatacija i eskalacija privilegija
 
 *Od slabe lozinke do roota u tri koraka. Rijetko je u pitanju genijalni exploit — češće slaba lozinka i jedna loša konfiguracija.*
 

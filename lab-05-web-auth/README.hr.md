@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 04 · napadni pa obrani · Sigurnost informacijskih sustava -->
-# Vježba 04 — Web napadi II: autentifikacija i pristup
+<!-- kicker: Vježba 05 · napadni pa obrani · Sigurnost informacijskih sustava -->
+# Vježba 05 — Web napadi II: autentifikacija i pristup
 
 *Prijavljen si kao ti — ali vidiš li tuđe podatke? Napadi na kontrolu pristupa i tokene često ne traže nijedan exploit, samo znatiželju.*
 

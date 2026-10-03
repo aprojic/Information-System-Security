@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 02 · attack then defend · Information System Security -->
-# Lab 02 — Network Traffic: Interception & Detection
+<!-- kicker: Lab 03 · attack then defend · Information System Security -->
+# Lab 03 — Network Traffic: Interception & Detection
 
 *On an unencrypted connection nothing is private. Intercept someone's login, then learn to spot the attacker in your own traffic.*
 
@@ -84,7 +84,7 @@ Briefly (3–5 sentences): why **TLS** would make the login from 1.1 unreadable,
 
 ## Submission
 
-- `lab02_<ID>.pdf` — screenshots of the interception and the ID packet, the `tshark` count output, the defensive write-up.
+- `lab03_<ID>.pdf` — screenshots of the interception and the ID packet, the `tshark` count output, the defensive write-up.
 - The capture `cap.pcapng` (or an excerpt).
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 

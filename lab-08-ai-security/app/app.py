@@ -1,4 +1,4 @@
-"""SecureBot — namjerno ranjiv LLM chatbot za Lab 07 (prompt injection).
+"""SecureBot — namjerno ranjiv LLM chatbot za Lab 08 (prompt injection).
 
 Student upiše svoj matični broj; flag se izvede iz njega i tajnog seeda
 (`ISS_SECRET`) te se stavi u sistemski prompt — upravo ono što se u praksi NE
@@ -19,7 +19,7 @@ GUARDRAIL = os.environ.get("GUARDRAIL", "off").lower() == "on"
 
 
 def make_flag(mb):
-    h = hmac.new(SECRET.encode(), f"lab07:{mb}".encode(), hashlib.sha256).hexdigest()[:6]
+    h = hmac.new(SECRET.encode(), f"lab08:{mb}".encode(), hashlib.sha256).hexdigest()[:6]
     return f"ASPIRA{{sis_ai_{h}}}"
 
 

@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 03 · attack then defend · Information System Security -->
-# Lab 03 — Web Attacks I: Injection & XSS
+<!-- kicker: Lab 04 · attack then defend · Information System Security -->
+# Lab 04 — Web Attacks I: Injection & XSS
 
 *The two oldest web attacks that still work today: dump a database through a search field, and steal a session through a comment box.*
 
@@ -77,7 +77,7 @@ In DVWA click **View Source** for both modules. Point to the exact line where in
 
 ## Submission
 
-- `lab03_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, write-up.
+- `lab04_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, write-up.
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading

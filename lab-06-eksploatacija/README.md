@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 05 · attack then defend · Information System Security -->
-# Lab 05 — Exploitation & Privilege Escalation
+<!-- kicker: Lab 06 · attack then defend · Information System Security -->
+# Lab 06 — Exploitation & Privilege Escalation
 
 *From a weak password to root in three steps. It's rarely a brilliant exploit — more often a weak password and one bad configuration.*
 
@@ -86,7 +86,7 @@ For each step (weak password → SSH → sudo misconfig) explain in one sentence
 
 ## Submission
 
-- `lab05_<ID>.pdf` — the whole chain with outputs, `/root/flag.txt`, `id` as root, defensive write-up.
+- `lab06_<ID>.pdf` — the whole chain with outputs, `/root/flag.txt`, `id` as root, defensive write-up.
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading

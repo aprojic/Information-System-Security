@@ -1,4 +1,4 @@
-# Lab 07 — meta: lokalni ranjivi LLM chatbot (SecureBot) + Ollama.
+# Lab 08 — meta: lokalni ranjivi LLM chatbot (SecureBot) + Ollama.
 # Prije pokretanja: kopiraj .env.example u .env i upiši ISS_SECRET (daje nastavnik).
 # Pokretanje (u Kaliju):
 #   docker compose up -d --build

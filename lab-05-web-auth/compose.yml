@@ -1,4 +1,4 @@
-# Lab 04 — meta: OWASP Juice Shop (broken auth / access control / JWT).
+# Lab 05 — meta: OWASP Juice Shop (broken auth / access control / JWT).
 # Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:3000
 # Zaustavljanje:          docker compose down
 services:

@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 04 · attack then defend · Information System Security -->
-# Lab 04 — Web Attacks II: Authentication & Access
+<!-- kicker: Lab 05 · attack then defend · Information System Security -->
+# Lab 05 — Web Attacks II: Authentication & Access
 
 *You're logged in as you — but can you see other people's data? Attacks on access control and tokens often need no exploit, just curiosity.*
 
@@ -71,7 +71,7 @@ Explain (3–5 sentences) why IDOR works (authorization relies on a client-suppl
 
 ## Submission
 
-- `lab04_<ID>.pdf` — findings, decoded JWT, Score Board screenshot with your ID account, defensive write-up.
+- `lab05_<ID>.pdf` — findings, decoded JWT, Score Board screenshot with your ID account, defensive write-up.
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading

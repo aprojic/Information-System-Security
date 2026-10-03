@@ -10,12 +10,13 @@ body:
       options:
         - Lab 00 — Setup
         - Lab 01 — Hashing
-        - Lab 02 — Network traffic
-        - Lab 03 — Injection & XSS
-        - Lab 04 — Auth & access
-        - Lab 05 — Exploitation & privesc
-        - Lab 06 — Capstone
-        - Lab 07 — AI security
+        - Lab 02 — Cryptography
+        - Lab 03 — Network traffic
+        - Lab 04 — Injection & XSS
+        - Lab 05 — Auth & access
+        - Lab 06 — Exploitation & privesc
+        - Lab 07 — Capstone
+        - Lab 08 — AI security
         - README
         - Other
     validations:

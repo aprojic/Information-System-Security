@@ -1,4 +1,4 @@
-# Lab 05 — namjerno ranjiva meta: SSH sa slabom lozinkom + sudo misconfig (privesc).
+# Lab 06 — namjerno ranjiva meta: SSH sa slabom lozinkom + sudo misconfig (privesc).
 # Isključivo za lab okruženje. Nije za izlaganje na mrežu.
 FROM debian:12-slim
 
