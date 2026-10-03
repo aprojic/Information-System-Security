@@ -5,7 +5,7 @@ tajnog nastavnikovog seeda (`ISS_SECRET`). Isti materijal ide svima; student pri
 radu upiše svoj matični broj, a meta/alat izračuna njegov flag. Nastavnik iste
 flagove dobije jednom naredbom nad popisom (vidi `flaggen/checker.py`).
 
-flag("lab07", "0036512345", secret) -> "ASPIRA{sis_ai_1a2b3c}"
+flag("lab08", "0036512345", secret) -> "ASPIRA{sis_ai_1a2b3c}"
 """
 import hashlib
 import hmac
@@ -13,9 +13,10 @@ import hmac
 # Format po vježbi (zadržan zbog uputa u handoutima, npr. Lab 01 mask napad).
 FORMAT = {
     "lab01": "ASPIRA{{sis_{}}}",
-    "lab05": "ASPIRA{{sis05_{}}}",
-    "lab06": "ASPIRA{{sis_incident_{}}}",
-    "lab07": "ASPIRA{{sis_ai_{}}}",
+    "lab02": "ASPIRA{{sis_crypto_{}}}",
+    "lab06": "ASPIRA{{sis06_{}}}",
+    "lab07": "ASPIRA{{sis_incident_{}}}",
+    "lab08": "ASPIRA{{sis_ai_{}}}",
 }
 
 

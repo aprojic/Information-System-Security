@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 03 · napadni pa obrani · Sigurnost informacijskih sustava -->
-# Vježba 03 — Web napadi I: injection i XSS
+<!-- kicker: Vježba 04 · napadni pa obrani · Sigurnost informacijskih sustava -->
+# Vježba 04 — Web napadi I: injection i XSS
 
 *Dva najstarija web napada koja i danas rade: izvući bazu kroz polje za pretragu i oteti sesiju kroz polje za komentar.*
 

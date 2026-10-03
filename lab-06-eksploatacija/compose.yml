@@ -1,4 +1,4 @@
-# Lab 05 — meta se gradi iz Dockerfilea (ranjivi SSH + sudo misconfig).
+# Lab 06 — meta se gradi iz Dockerfilea (ranjivi SSH + sudo misconfig).
 # Prije: kopiraj .env.example u .env, upiši SVOJ matični broj i ISS_SECRET (nastavnik).
 # Pokretanje (u Kaliju):  docker compose up -d --build   →  SSH na localhost:2222
 # Zaustavljanje:          docker compose down

@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 02 · napadni pa obrani · Sigurnost informacijskih sustava -->
-# Vježba 02 — Mrežni promet: presretanje i detekcija
+<!-- kicker: Vježba 03 · napadni pa obrani · Sigurnost informacijskih sustava -->
+# Vježba 03 — Mrežni promet: presretanje i detekcija
 
 *Na nešifriranoj vezi ništa nije privatno. Presretni tuđu prijavu, pa nauči prepoznati napadača u vlastitom prometu.*
 

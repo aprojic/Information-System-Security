@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 06 · capstone · crveni i plavi tim · Sigurnost informacijskih sustava -->
-# Vježba 06 — Napad i istraga (capstone)
+<!-- kicker: Vježba 07 · capstone · crveni i plavi tim · Sigurnost informacijskih sustava -->
+# Vježba 07 — Napad i istraga (capstone)
 
 *Spoji sve: prvo probij trgovinu kao crveni tim, pa iz logova rekonstruiraj tuđi napad kao plavi tim.*
 

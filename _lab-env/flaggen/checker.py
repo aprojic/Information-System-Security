@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # _lab-env na path
 from flaglib import make_flag  # noqa: E402
 
-LABS = ["lab01", "lab05", "lab06", "lab07"]
+LABS = ["lab01", "lab02", "lab06", "lab07", "lab08"]
 
 
 def main():

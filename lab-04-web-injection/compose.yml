@@ -1,5 +1,6 @@
-# Lab 02 — meta: DVWA preko običnog HTTP-a (za presretanje prijave).
+# Lab 04 — meta: DVWA (SQL injection + XSS).
 # Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:4280  (admin / password)
+#   U DVWA-u: Create/Reset Database, pa DVWA Security postavi na "Low" (kasnije "Medium").
 # Zaustavljanje:          docker compose down
 services:
   dvwa:

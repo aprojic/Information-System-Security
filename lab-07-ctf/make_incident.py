@@ -1,4 +1,4 @@
-"""Lab 06 — generira TVOJ incident.log iz tvog matičnog broja.
+"""Lab 07 — generira TVOJ incident.log iz tvog matičnog broja.
 
     ISS_SECRET='<daje nastavnik>' python make_incident.py <maticni_broj>
 
@@ -18,7 +18,7 @@ SECRET = os.environ.get("ISS_SECRET")
 if not SECRET:
     sys.exit("error: postavi ISS_SECRET (daje nastavnik)")
 
-hex6 = hmac.new(SECRET.encode(), f"lab06:{MB}".encode(), hashlib.sha256).hexdigest()[:6]
+hex6 = hmac.new(SECRET.encode(), f"lab07:{MB}".encode(), hashlib.sha256).hexdigest()[:6]
 flag = f"ASPIRA{{sis_incident_{hex6}}}"
 b64 = base64.b64encode(flag.encode()).decode()
 

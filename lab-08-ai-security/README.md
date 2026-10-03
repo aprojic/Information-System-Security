@@ -1,7 +1,7 @@
 **Language:** English · [Hrvatski](README.hr.md)
 
-<!-- kicker: Lab 07 · attack then defend · Information System Security -->
-# Lab 07 — AI Security: Prompt Injection
+<!-- kicker: Lab 08 · attack then defend · Information System Security -->
+# Lab 08 — AI Security: Prompt Injection
 
 *Apps built on language models have a new attack surface: the input itself. Extract a secret from a chatbot with words, then show why an output filter is a patch, not a cure.*
 
@@ -73,7 +73,7 @@ In `.env`/`compose.yml` set `GUARDRAIL: "on"` and bring `securebot` back up (`do
 
 ## Submission
 
-- `lab07_<ID>.pdf` — attempts with responses, extracted flag, filter bypass, defensive write-up.
+- `lab08_<ID>.pdf` — attempts with responses, extracted flag, filter bypass, defensive write-up.
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading

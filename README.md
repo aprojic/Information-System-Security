@@ -25,12 +25,13 @@ You run everything from a **Kali Linux** machine with Docker — set it up once 
 |:-:|---|---|---|
 | 00 | [Set up your lab](lab-00-okruzenje/README.md) | — | Kali + Docker |
 | 01 | [Password hashing & cracking](lab-01-hashiranje/README.md) | crack weak hashes → salt + slow KDF | hashcat |
-| 02 | [Network traffic: interception & detection](lab-02-promet/README.md) | sniff a login → spot the scan | DVWA |
-| 03 | [Web attacks I: injection & XSS](lab-03-web-injection/README.md) | SQLi + XSS → parameterize + encode | DVWA |
-| 04 | [Web attacks II: authentication & access](lab-04-web-auth/README.md) | IDOR + JWT → server-side authz | OWASP Juice Shop |
-| 05 | [Exploitation & privilege escalation](lab-05-eksploatacija/README.md) | crack + privesc → close the chain | vulnerable SSH container |
-| 06 | [Capstone: attack & investigate](lab-06-ctf/README.md) | CTF → incident analysis | Juice Shop + logs |
-| 07 | [AI security: prompt injection](lab-07-ai-security/README.md) | extract a secret → guardrails | local LLM (Ollama) |
+| 02 | [Cryptography: breaking weak crypto](lab-02-kriptografija/README.md) | recover a flag from bad "encryption" → AES-GCM | openssl + Python |
+| 03 | [Network traffic: interception & detection](lab-03-promet/README.md) | sniff a login → spot the scan | DVWA |
+| 04 | [Web attacks I: injection & XSS](lab-04-web-injection/README.md) | SQLi + XSS → parameterize + encode | DVWA |
+| 05 | [Web attacks II: authentication & access](lab-05-web-auth/README.md) | IDOR + JWT → server-side authz | OWASP Juice Shop |
+| 06 | [Exploitation & privilege escalation](lab-06-eksploatacija/README.md) | crack + privesc → close the chain | vulnerable SSH container |
+| 07 | [Capstone: attack & investigate](lab-07-ctf/README.md) | CTF → incident analysis | Juice Shop + logs |
+| 08 | [AI security: prompt injection](lab-08-ai-security/README.md) | extract a secret → guardrails | local LLM (Ollama) |
 
 ## 🚩 How the labs work
 

@@ -1,7 +1,7 @@
 **Jezik:** [English](README.md) · Hrvatski
 
-<!-- kicker: Vježba 07 · napadni pa obrani · Sigurnost informacijskih sustava -->
-# Vježba 07 — Sigurnost AI sustava: prompt injection
+<!-- kicker: Vježba 08 · napadni pa obrani · Sigurnost informacijskih sustava -->
+# Vježba 08 — Sigurnost AI sustava: prompt injection
 
 *Aplikacije s jezičnim modelima imaju novu napadnu površinu: sam unos. Izvuci tajnu iz chatbota riječima, pa pokaži zašto je filtar na izlazu krpa, a ne lijek.*
 
