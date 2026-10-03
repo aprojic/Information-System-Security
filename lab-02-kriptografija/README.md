@@ -25,17 +25,15 @@
 ## Prerequisites
 
 - [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali working.
-- [ ] `openssl`, `xxd`, `python3` (standard on Kali) and the Python `cryptography` package:
-  ```bash
-  sudo apt install -y python3-cryptography
-  ```
+- [ ] `openssl`, `xxd`, `python3` (standard on Kali); the Python `cryptography` package is installed in Setup below.
 - [ ] Your **student ID (matični broj)**.
 
 ## Setup · ~5 min
 
-From Merlin, download the lab folder (it contains `ecb_demo.bin`) and **your** file `vault_<ID>.b64` (Flicker's "encrypted" secret). Check your tools:
+From Merlin, download the lab folder (it contains `ecb_demo.bin`) and **your** file `vault_<ID>.b64` (Flicker's "encrypted" secret). Install the one extra package and check your tools:
 
 ```bash
+sudo apt install -y python3-cryptography   # needed for Part 2
 openssl version
 python3 -c "import cryptography; print('cryptography', cryptography.__version__)"
 ```
@@ -74,7 +72,7 @@ print(ks.hex())   # look closely: the bytes start repeating
 ```
 
 > [!TIP]
-> **Find the period.** The recovered bytes repeat — e.g. bytes 12–17 equal bytes 0–5, so the key is **12 bytes** long. Take the first 12 bytes as the key and XOR it (repeating) over the *whole* ciphertext to decrypt everything — including the 6 hex characters you didn't know.
+> **Find the period.** The recovered bytes repeat — at what offset does the pattern restart? That offset is your **key length**. Take that many bytes as the key and XOR it (repeating) over the *whole* ciphertext to decrypt everything — including the 6 hex characters you didn't know.
 
 **In the report:** the recovered key (hex), **your flag**, and the commands/code you used (your asciinema recording is the process log).
 

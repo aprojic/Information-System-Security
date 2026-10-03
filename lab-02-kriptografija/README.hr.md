@@ -25,17 +25,15 @@
 ## Preduvjeti
 
 - [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali radi.
-- [ ] `openssl`, `xxd`, `python3` (standardno na Kaliju) i Python paket `cryptography`:
-  ```bash
-  sudo apt install -y python3-cryptography
-  ```
+- [ ] `openssl`, `xxd`, `python3` (standardno na Kaliju); Python paket `cryptography` instalira se u Pripremi niže.
 - [ ] Tvoj **matični broj studenta**.
 
 ## Priprema · ~5 min
 
-S Merlina preuzmi mapu vježbe (sadrži `ecb_demo.bin`) i **svoju** datoteku `vault_<MB>.b64` (Flickerova „enkriptirana" tajna). Provjeri alate:
+S Merlina preuzmi mapu vježbe (sadrži `ecb_demo.bin`) i **svoju** datoteku `vault_<MB>.b64` (Flickerova „enkriptirana" tajna). Instaliraj jedan dodatni paket i provjeri alate:
 
 ```bash
+sudo apt install -y python3-cryptography   # treba za Dio 2
 openssl version
 python3 -c "import cryptography; print('cryptography', cryptography.__version__)"
 ```
@@ -74,7 +72,7 @@ print(ks.hex())   # pogledaj pažljivo: bajtovi se počinju ponavljati
 ```
 
 > [!TIP]
-> **Nađi period.** Vraćeni bajtovi se ponavljaju — npr. bajtovi 12–17 jednaki su bajtovima 0–5, što znači da je ključ dug **12 bajtova**. Uzmi prvih 12 bajtova kao ključ i XOR-aj ga (ponavljajući) preko *cijelog* šifrata da dešifriraš sve — uključujući 6 heksadekadskih znakova koje nisi znao.
+> **Nađi period.** Vraćeni bajtovi se ponavljaju — na kojem se offsetu uzorak ponovno pokrene? Taj offset je **duljina ključa**. Uzmi toliko bajtova kao ključ i XOR-aj ga (ponavljajući) preko *cijelog* šifrata da dešifriraš sve — uključujući 6 heksadekadskih znakova koje nisi znao.
 
 **U izvještaj:** vraćeni ključ (hex), **tvoj flag** i naredbe/kôd koje si koristio (asciinema snimka je log procesa).
 
