@@ -72,6 +72,13 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 > [!TIP]
 > **Common pitfall.** `permission denied` on `docker` → you didn't log out/in after `usermod` (or run with `sudo`). Port 3000 busy → use `-p 3001:3000` and open `:3001`.
 
+## Stay up to date (optional, 1 min)
+
+On the [course repository](https://github.com/aprojic/Information-System-Security), top right:
+
+1. Click **⭐ Star** — a bookmark, so the labs are always under *Your stars* on your profile.
+2. Click **Watch → Custom**, tick **Releases**, then **Apply** — GitHub emails you when a new lab is published. (A star alone sends no notifications.)
+
 ## Check — are you ready for Lab 01
 
 - [ ] Kali boots and you log in (`kali`/`kali`).
@@ -79,5 +86,6 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 - [ ] `docker run hello-world` passes.
 - [ ] Juice Shop opens at `http://localhost:3000`.
 - [ ] A `clean` snapshot exists.
+- [ ] (Optional) You starred the repo and watch its releases.
 
 Lab 00 is not graded, but it is a **prerequisite** for Lab 01. If something doesn't work, tell the instructor at the start of the session.

@@ -43,6 +43,9 @@ The material is the same for everyone. The personal part is **your student ID (m
 
 A copied flag won't match your student ID, so it won't count. Full student guide: see the course page on Merlin.
 
+> [!TIP]
+> **Get an email when a new lab is published:** click **Watch → Custom → Releases** (top right). **⭐ Star** the repo to keep it in your bookmarks (a star alone sends no notifications).
+
 ## 📁 What's inside
 
 - `lab-NN-*/` — each lab: `README.md` (English) and `README.hr.md` (Croatian) instructions + its `compose.yml` / target files. The README is the single source: GitHub renders it, and `tools/build-pdf.sh lab-NN/README.md` produces the styled Merlin PDF from the same file.
