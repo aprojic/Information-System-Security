@@ -21,7 +21,7 @@
 
 ## Preduvjeti
 
-- [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali + Docker rade.
+- [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali + Docker rade.
 - [ ] Alati `wireshark`, `tshark`, `tcpdump`, `nmap`, `curl` (na Kaliju su).
 - [ ] Tvoj **matični broj** (koristiš ga kao biljeg u prometu).
 

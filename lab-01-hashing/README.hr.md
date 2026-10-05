@@ -24,7 +24,7 @@
 
 ## Preduvjeti
 
-- [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali radi.
+- [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali radi.
 - [ ] Alati `hashcat`, `hashid`, `john` i wordlista `rockyou.txt` (standardno na Kaliju).
 - [ ] Tvoj **matični broj studenta**.
 

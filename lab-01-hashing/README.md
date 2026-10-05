@@ -24,7 +24,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali working.
 - [ ] Tools `hashcat`, `hashid`, `john` and the `rockyou.txt` wordlist (standard on Kali).
 - [ ] Your **student ID (matični broj)**.
 

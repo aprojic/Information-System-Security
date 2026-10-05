@@ -21,7 +21,7 @@
 
 ## Preduvjeti
 
-- [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali + Docker rade.
+- [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali + Docker rade.
 - [ ] Osnove HTTP-a i HTML-a; pojam "sesija / kolačić".
 - [ ] (Korisno) Burp Suite ili preglednikov DevTools.
 

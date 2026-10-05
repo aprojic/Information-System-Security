@@ -21,7 +21,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali + Docker working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
 - [ ] Browser DevTools (Network and Application tabs) or Burp Suite.
 - [ ] Concepts: session, token, Base64, JSON.
 

@@ -17,19 +17,19 @@ Hands-on labs for **Sigurnost informacijskih sustava / Information System Securi
 
 ## 🧰 Environment
 
-You run everything from a **Kali Linux** machine with Docker — set it up once in **[Lab 00](lab-00-okruzenje/README.md)**. This is *not* a GitHub Codespaces repo: the labs use GUI and offensive tools (Wireshark, Burp, hashcat, nmap, Metasploit) that belong on Kali, and Docker runs the vulnerable targets inside it.
+You run everything from a **Kali Linux** machine with Docker — set it up once in **[Lab 00](lab-00-setup/README.md)**. This is *not* a GitHub Codespaces repo: the labs use GUI and offensive tools (Wireshark, Burp, hashcat, nmap, Metasploit) that belong on Kali, and Docker runs the vulnerable targets inside it.
 
 ## 🧪 Labs
 
 | # | Lab | Attack → Defend | Target |
 |:-:|---|---|---|
-| 00 | [Set up your lab](lab-00-okruzenje/README.md) | — | Kali + Docker |
-| 01 | [Password hashing & cracking](lab-01-hashiranje/README.md) | crack weak hashes → salt + slow KDF | hashcat |
-| 02 | [Cryptography: breaking weak crypto](lab-02-kriptografija/README.md) | recover a flag from bad "encryption" → AES-GCM | openssl + Python |
-| 03 | [Network traffic: interception & detection](lab-03-promet/README.md) | sniff a login → spot the scan | DVWA |
+| 00 | [Set up your lab](lab-00-setup/README.md) | — | Kali + Docker |
+| 01 | [Password hashing & cracking](lab-01-hashing/README.md) | crack weak hashes → salt + slow KDF | hashcat |
+| 02 | [Cryptography: breaking weak crypto](lab-02-crypto/README.md) | recover a flag from bad "encryption" → AES-GCM | openssl + Python |
+| 03 | [Network traffic: interception & detection](lab-03-network/README.md) | sniff a login → spot the scan | DVWA |
 | 04 | [Web attacks I: injection & XSS](lab-04-web-injection/README.md) | SQLi + XSS → parameterize + encode | DVWA |
 | 05 | [Web attacks II: authentication & access](lab-05-web-auth/README.md) | IDOR + JWT → server-side authz | OWASP Juice Shop |
-| 06 | [Exploitation & privilege escalation](lab-06-eksploatacija/README.md) | crack + privesc → close the chain | vulnerable SSH container |
+| 06 | [Exploitation & privilege escalation](lab-06-exploitation/README.md) | crack + privesc → close the chain | vulnerable SSH container |
 | 07 | [Capstone: attack & investigate](lab-07-ctf/README.md) | CTF → incident analysis | Juice Shop + logs |
 | 08 | [AI security: prompt injection](lab-08-ai-security/README.md) | extract a secret → guardrails | local LLM (Ollama) |
 
