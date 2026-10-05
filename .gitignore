@@ -10,3 +10,6 @@ _lab-env/flaggen/out/
 *.cast
 __pycache__/
 *.pyc
+
+# macOS
+.DS_Store
