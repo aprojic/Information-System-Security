@@ -69,8 +69,16 @@ docker run hello-world
 docker run --rm -p 3000:3000 bkimminich/juice-shop
 ```
 
+4. Prepare the password-cracking tools (used from Lab 01). A VM has **no GPU**, so hashcat needs a CPU backend (`pocl-opencl-icd`), and the `rockyou` wordlist must be unpacked:
+
+```bash
+sudo apt install -y hashcat wordlists pocl-opencl-icd
+sudo gunzip -kf /usr/share/wordlists/rockyou.txt.gz
+hashcat -I            # should list a device (Type: CPU), not "No devices found/left"
+```
+
 > [!TIP]
-> **Common pitfall.** `permission denied` on `docker` → you didn't log out/in after `usermod` (or run with `sudo`). Port 3000 busy → use `-p 3001:3000` and open `:3001`.
+> **Common pitfall.** `permission denied` on `docker` → you didn't log out/in after `usermod` (or run with `sudo`). Port 3000 busy → use `-p 3001:3000` and open `:3001`. hashcat says **`No devices found/left`** → you're in a VM without a GPU; install `pocl-opencl-icd` (above) for a CPU device.
 
 ## Stay up to date (optional, 1 min)
 
@@ -82,7 +90,8 @@ On the [course repository](https://github.com/aprojic/Information-System-Securit
 ## Check — are you ready for Lab 01
 
 - [ ] Kali boots and you log in (`kali`/`kali`).
-- [ ] `hashcat --version` and `john --version` print a version.
+- [ ] `hashcat --version` and `john --version` print a version, and `hashcat -I` lists a device.
+- [ ] `/usr/share/wordlists/rockyou.txt` exists (unpacked).
 - [ ] `docker run hello-world` passes.
 - [ ] Juice Shop opens at `http://localhost:3000`.
 - [ ] A `clean` snapshot exists.

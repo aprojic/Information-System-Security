@@ -69,8 +69,16 @@ docker run hello-world
 docker run --rm -p 3000:3000 bkimminich/juice-shop
 ```
 
+4. Pripremi alate za razbijanje lozinki (koriste se od Vježbe 01). VM **nema GPU**, pa hashcatu treba CPU backend (`pocl-opencl-icd`), a `rockyou` wordlistu treba raspakirati:
+
+```bash
+sudo apt install -y hashcat wordlists pocl-opencl-icd
+sudo gunzip -kf /usr/share/wordlists/rockyou.txt.gz
+hashcat -I            # treba izlistati uređaj (Type: CPU), ne „No devices found/left"
+```
+
 > [!TIP]
-> **Čest problem.** `permission denied` na `docker` → nisi se odjavio/prijavio nakon `usermod` (ili pokreni sa `sudo`). Port 3000 zauzet → koristi `-p 3001:3000` i otvori `:3001`.
+> **Čest problem.** `permission denied` na `docker` → nisi se odjavio/prijavio nakon `usermod` (ili pokreni sa `sudo`). Port 3000 zauzet → koristi `-p 3001:3000` i otvori `:3001`. hashcat javi **`No devices found/left`** → u VM-u si bez GPU-a; instaliraj `pocl-opencl-icd` (gore) za CPU uređaj.
 
 ## Ostani u toku (opcionalno, 1 min)
 
@@ -82,7 +90,8 @@ Na [repozitoriju kolegija](https://github.com/aprojic/Information-System-Securit
 ## Provjera — jesi li spreman za Vježbu 01
 
 - [ ] Kali se pokreće i prijaviš se (`kali`/`kali`).
-- [ ] `hashcat --version` i `john --version` ispisuju verziju.
+- [ ] `hashcat --version` i `john --version` ispisuju verziju, a `hashcat -I` izlista uređaj.
+- [ ] Postoji `/usr/share/wordlists/rockyou.txt` (raspakiran).
 - [ ] `docker run hello-world` prolazi.
 - [ ] Juice Shop se otvori na `http://localhost:3000`.
 - [ ] Postoji snapshot `clean`.
