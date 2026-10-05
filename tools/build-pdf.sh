@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Build a Merlin PDF from a lab's GitHub README (single source).
-# Usage (from repo root):  tools/build-pdf.sh lab-01-hashiranje/README.md
-#        Croatian:         tools/build-pdf.sh lab-01-hashiranje/README.hr.md
+# Usage (from repo root):  tools/build-pdf.sh lab-01-hashing/README.md
+#        Croatian:         tools/build-pdf.sh lab-01-hashing/README.hr.md
 # Output: <same dir>/README.pdf (or README.hr.pdf). PDFs are git-ignored.
 # Needs: apex, Google Chrome, python3.
 set -euo pipefail

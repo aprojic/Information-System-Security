@@ -21,7 +21,7 @@
 
 ## Preduvjeti
 
-- [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali + Docker rade.
+- [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali + Docker rade.
 - [ ] ≥ 4 GB slobodnog RAM-a i ~2 GB diska (model se preuzima lokalno).
 - [ ] Pojmovi: LLM, sistemski prompt, kontekst.
 

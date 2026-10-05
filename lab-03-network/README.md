@@ -21,7 +21,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali + Docker working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
 - [ ] Tools `wireshark`, `tshark`, `tcpdump`, `nmap`, `curl` (present on Kali).
 - [ ] Your **student ID** (you'll use it as a marker in the traffic).
 

@@ -21,7 +21,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali + Docker working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
 - [ ] HTTP and HTML basics; the idea of "session / cookie".
 - [ ] (Useful) Burp Suite or the browser's DevTools.
 

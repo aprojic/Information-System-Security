@@ -19,7 +19,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali (+ Docker) working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali (+ Docker) working.
 - [ ] Your student ID (matični broj).
 
 ## Setup · ~10 min

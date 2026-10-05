@@ -21,7 +21,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali + Docker working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
 - [ ] ≥ 4 GB free RAM and ~2 GB disk (the model downloads locally).
 - [ ] Concepts: LLM, system prompt, context.
 

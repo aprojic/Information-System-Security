@@ -24,7 +24,7 @@
 
 ## Preduvjeti
 
-- [ ] [Vježba 00](../lab-00-okruzenje/README.hr.md) odrađena — Kali radi.
+- [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali radi.
 - [ ] `openssl`, `xxd`, `python3` (standardno na Kaliju); Python paket `cryptography` instalira se u Pripremi niže.
 - [ ] Tvoj **matični broj studenta**.
 

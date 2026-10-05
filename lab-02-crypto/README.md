@@ -24,7 +24,7 @@
 
 ## Prerequisites
 
-- [ ] [Lab 00](../lab-00-okruzenje/README.md) completed — Kali working.
+- [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali working.
 - [ ] `openssl`, `xxd`, `python3` (standard on Kali); the Python `cryptography` package is installed in Setup below.
 - [ ] Your **student ID (matični broj)**.
 
