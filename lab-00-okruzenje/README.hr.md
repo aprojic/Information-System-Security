@@ -72,6 +72,13 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 > [!TIP]
 > **Čest problem.** `permission denied` na `docker` → nisi se odjavio/prijavio nakon `usermod` (ili pokreni sa `sudo`). Port 3000 zauzet → koristi `-p 3001:3000` i otvori `:3001`.
 
+## Ostani u toku (opcionalno, 1 min)
+
+Na [repozitoriju kolegija](https://github.com/aprojic/Information-System-Security), gore desno:
+
+1. Klikni **⭐ Star** — to je oznaka, pa su vježbe uvijek pod *Your stars* na tvom profilu.
+2. Klikni **Watch → Custom**, označi **Releases** pa **Apply** — GitHub ti šalje e-mail kad izađe nova vježba. (Samo star ne šalje obavijesti.)
+
 ## Provjera — jesi li spreman za Vježbu 01
 
 - [ ] Kali se pokreće i prijaviš se (`kali`/`kali`).
@@ -79,5 +86,6 @@ docker run --rm -p 3000:3000 bkimminich/juice-shop
 - [ ] `docker run hello-world` prolazi.
 - [ ] Juice Shop se otvori na `http://localhost:3000`.
 - [ ] Postoji snapshot `clean`.
+- [ ] (Opcionalno) Zvjezdica i praćenje izdanja repozitorija.
 
 Vježba 00 se ne boduje, ali je **preduvjet** za Vježbu 01. Ako nešto ne radi, javi na početku termina.
