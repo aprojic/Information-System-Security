@@ -52,7 +52,7 @@ Mete (od Vježbe 03 nadalje) vrte se kao Docker kontejneri unutar Kalija.
 1. Instaliraj Docker i pokreni servis:
 
 ```bash
-sudo apt update && sudo apt install -y docker.io
+sudo apt update && sudo apt install -y docker.io docker-compose-v2
 sudo systemctl enable docker --now
 sudo usermod -aG docker $USER
 ```
