@@ -52,7 +52,7 @@ Targets (from Lab 03 onward) run as Docker containers inside Kali.
 1. Install Docker and start the service:
 
 ```bash
-sudo apt update && sudo apt install -y docker.io
+sudo apt update && sudo apt install -y docker.io docker-compose-v2
 sudo systemctl enable docker --now
 sudo usermod -aG docker $USER
 ```
