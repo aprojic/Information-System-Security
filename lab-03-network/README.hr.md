@@ -114,7 +114,7 @@ Kratko (3–5 rečenica): zašto bi **TLS** učinio prijavu iz 1.1 nečitljivom,
 
 ## Predaja
 
-- `vjezba02_<MB>.pdf` — screenshotovi presretanja i paketa s matičnim brojem, izlaz `tshark` brojanja, obrambeni osvrt.
+- `vjezba03_<MB>.pdf` — screenshotovi presretanja i paketa s matičnim brojem, izlaz `tshark` brojanja, obrambeni osvrt.
 - Snimka `cap.pcapng` (ili isječak).
 - **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
