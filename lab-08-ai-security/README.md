@@ -40,13 +40,40 @@ Open `http://localhost:5000` and **enter your student ID**. SecureBot then has y
 > [!TIP]
 > **Common pitfall.** The first reply is slow while the model loads. A model error → check that `ollama pull` finished (`docker compose logs ollama`).
 
+## Background — prompt injection in one minute
+
+An LLM app like SecureBot builds one block of text from two sources — the **system prompt** the developer wrote (the rules, and here the secret) and your message — and hands the whole thing to the model as a single context. The model has no reliable way to tell "trusted instructions" from "untrusted data": both arrive through the **same text channel**, so input you control can carry instructions the model then follows, overriding the developer's rules. This is the AI analogue of the injection you met in the web lab — data treated as code — and the **OWASP LLM Top 10** lists it as **LLM01**, its top entry. In practice it lets an attacker leak the system prompt (and any secret sitting in it), bypass a "don't reveal" rule, or — in apps where the model can call tools — make it exfiltrate data or act on the attacker's behalf.
+
+Defences help but none is complete. An **output filter** like SecureBot's guardrail strips the known secret string, yet the same secret can come back transformed — and a filter looking for one exact spelling never matches it. Input filtering, **privilege separation** (least privilege for any tools, a human in the loop for sensitive actions) and treating the model's output as untrusted all raise the bar — but OWASP itself says it is unclear whether any fool-proof prevention exists, and that is the key lesson: prompt injection has no complete fix. The real defence is architectural — **don't put secrets or privileges in the prompt at all** and enforce authorization outside the model, so that even a successful injection reveals nothing worth having.
+
+```mermaid
+flowchart LR
+  subgraph channel["One text channel (the injection)"]
+    direction LR
+    SP["system prompt (trusted)"] --> CTX["one context"]
+    UI["user input (untrusted)"] -->|hidden instruction| CTX
+    CTX --> F["model follows injected instruction"]
+    F --> LEAK["system prompt + secret leak"]
+  end
+  subgraph fix["Mitigation (constrain it)"]
+    direction LR
+    NP["no secret in prompt, least privilege"] --> SAFE["injection reveals nothing"]
+  end
+```
+
+You play both sides: in Part 1 you make the model hand over a secret it was told to guard, then in Part 2 you slip past a filter that looks for the exact string and see why only keeping the secret out of the prompt actually holds.
+
 ## Part 1 — Offensive: extract the secret · ~35 min
 
 ### 1.1 Direct prompt injection
 Try to override the "don't reveal" instruction (role-play, claiming a new context, asking for "previous instructions"). Document what worked and what didn't.
 
+There is no privilege boundary inside that single context: your message and the system prompt are just text the model weighs together, so a convincing reframing — a new role, a claimed new context, "ignore the previous instructions" — can outweigh the rule telling it to stay quiet.
+
 ### 1.2 Indirect / bypass approach
 If direct asking fails, make the model **transform** the secret (spell it out, translate, encode, "letter by letter") or print its system prompt, and reconstruct `ASPIRA{sis_ai_...}`. For a 1B model, asking it to print its **full system prompt verbatim** is usually the most reliable way to get the exact flag — "spell it letter by letter" often mangles the hex.
+
+The "don't reveal" line is only an instruction competing with yours, not an access control — the secret is plain text already sitting in the model's context, so any phrasing that gets the model to emit or transform that text wins, even when it never states it "directly".
 
 > [!NOTE]
 > **Expected.** A small model struggles to keep the secret consistently — a combination of techniques yields the full code. That is your flag.
@@ -58,7 +85,11 @@ If direct asking fails, make the model **transform** the secret (spell it out, t
 ### 2.1 Turn on the naive defence
 In `.env`/`compose.yml` set `GUARDRAIL: "on"` and bring `securebot` back up (`docker compose up -d securebot`). Now the app strips the exact code from responses. Repeat the attack.
 
+The filter runs on the model's output *after* it has already read the secret into its context, and it removes only one exact spelling of the flag — it patches the symptom you saw last time, not the leak itself.
+
 ### 2.2 Bypass the filter
+An exact-string filter can only match the flag written one way, so it cannot cover every encoding of the same secret — which is exactly why the model's output has to be treated as untrusted.
+
 **In the report:** show you bypass it by making the model **not print the secret verbatim** (spaced out, letter by letter, Base64, another language), then reassemble it. Attach an example.
 
 ### 2.3 The real defence
