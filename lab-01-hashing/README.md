@@ -96,8 +96,7 @@ Briefly (3–5 sentences), using your measurements, explain the **salt** (defeat
 
 ## Submission
 
-- `lab01_<ID>.pdf` — report with both tables, your flag, the speed comparison, the defensive write-up.
-- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab01.cast`, stop with `Ctrl-D`) — required; also include the `hashcat --show` output in the report.
+- `lab01_<ID>.pdf` — report with both tables, your flag, the `hashcat --show` output, the speed comparison, the defensive write-up.
 
 ## Grading
 

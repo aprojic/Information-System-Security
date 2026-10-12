@@ -74,7 +74,7 @@ print(ks.hex())   # look closely: the bytes start repeating
 > [!TIP]
 > **Find the period.** The recovered bytes repeat — at what offset does the pattern restart? That offset is your **key length**. Take that many bytes as the key and XOR it (repeating) over the *whole* ciphertext to decrypt everything — including the 6 hex characters you didn't know.
 
-**In the report:** the recovered key (hex), **your flag**, and the commands/code you used (your asciinema recording is the process log).
+**In the report:** the recovered key (hex), **your flag**, and the commands/code you used.
 
 ## Part 2 — Defensive: encryption that holds · ~25 min
 
@@ -135,7 +135,6 @@ aes.decrypt(nonce, bytes(bad), None)   # raises cryptography.exceptions.InvalidT
 ## Submission
 
 - `lab02_<ID>.pdf` — report with the `xxd` ECB finding, the recovered key and **your flag**, the AES-GCM output, the integrity test, and the defensive write-up.
-- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab02.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
 
 ## Grading
 

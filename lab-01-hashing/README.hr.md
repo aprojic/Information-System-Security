@@ -96,8 +96,7 @@ Kratko (3–5 rečenica), koristeći svoja mjerenja, objasni **sol** (onemoguću
 
 ## Predaja
 
-- `vjezba01_<MB>.pdf` — izvještaj s objema tablicama, flagom, usporedbom brzina, obrambenim osvrtom.
-- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba01.cast`, zaustavi s `Ctrl-D`) — obavezna; `hashcat --show` izlaz uključi u izvještaj.
+- `vjezba01_<MB>.pdf` — izvještaj s objema tablicama, flagom, `hashcat --show` izlazom, usporedbom brzina, obrambenim osvrtom.
 
 ## Bodovanje
 
