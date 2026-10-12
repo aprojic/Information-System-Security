@@ -37,11 +37,19 @@ hashcat --version
 ls -l /usr/share/wordlists/rockyou.txt   # po potrebi: sudo gunzip /usr/share/wordlists/rockyou.txt.gz
 ```
 
+## Pozadina — hashiranje u minuti
+
+Web stranica mora provjeriti tvoju lozinku, a da je nikad *ne pohrani*, jer svaka baza može procuriti. Zato umjesto lozinke sprema **hash**: jednosmjerni otisak koji računa funkcija poput MD5 ili bcrypta. Isti ulaz uvijek daje isti hash, ali nema „undo" — funkciju ne možeš pokrenuti unatrag da vratiš lozinku. Pri prijavi stranica hashira ono što si upisao i usporedi dva otiska.
+
+Zato razbijanje procurenog hasha znači **pogađanje**: hashiraš kandidata, provjeriš poklapa li se otisak, ponoviš. Koliko je curenje zapravo opasno ovisi o jednoj stvari — koliko *brzo* napadač može vrtjeti tu petlju — a to je inženjerska odluka koju je stranica donijela biranjem hash funkcije. **Brza** funkcija (MD5, SHA-1) napadaču omogućuje milijarde pokušaja u sekundi; namjerno **spora** (bcrypt, argon2) samo nekoliko tisuća. Nije akademski: curenja LinkedIna (2012.) i Adobea objavila su stotine milijuna loše hashiranih lozinki koje su razbijene masovno. U ovoj vježbi igraš obje strane — MD5 hasheve isprazniš u sekundama, pa gledaš kako isti napad zapinje na bcryptu.
+
 ## Dio 1 — Ofenzivno: razbijanje lozinki · ~40 min
 
 ### 1.1 Identifikacija hasheva
 
 Za svaki od pet hasheva odredi vjerojatni tip sa `hashid '<hash>'`. **U izvještaj:** tablica s pet redaka (redni broj, hash, tip, hashcat mode `-m`). Jedan je bcrypt (`$2b$...`), ostali MD5.
+
+Identifikacija tipa je prvi potez pravog napadača, ne formalnost: svaki algoritam ima svoju cijenu napada, a hashcatu treba točan broj modea (`-m`) da uopće krene. Tip čitaš iz oblika — goli niz od 32 heksadekadska znaka je MD5; niz koji počinje s `$2b$` je bcrypt, koji sol i cost faktor nosi u sebi.
 
 ### 1.2 Dictionary napad na slabe hasheve
 
@@ -49,6 +57,8 @@ Za svaki od pet hasheva odredi vjerojatni tip sa `hashid '<hash>'`. **U izvješt
 hashcat -m 0 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt
 hashcat -m 0 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt --show
 ```
+
+Dictionary napad (`-a 0`) jednostavno hashira svaku riječ iz ogromne liste stvarnih lozinki i svaku usporedi s tvojim hashevima. `rockyou.txt` je ~14 milijuna lozinki procurjelih iz stvarnog curenja 2009. — ako je korisnik izabrao bilo što uobičajeno, tu je. Protiv brzog hasha poput MD5 cijela lista prođe za manje od sekunde, i upravo zato se MD5 nikad ne smije koristiti za pohranu lozinki.
 
 > [!NOTE]
 > **Očekivano.** Tri MD5 hasha pucaju gotovo trenutno. hashcat ovdje ignorira bcrypt hash (nije mode 0); za taj redak može javiti `Token length exception` — to je u redu, bcrypt se preskače.
@@ -61,6 +71,8 @@ Jedan MD5 hash je tvoj osobni flag, oblika `ASPIRA{sis_XXXXXX}`, gdje je `XXXXXX
 hashcat -m 0 -a 3 hashes_<MB>.txt 'ASPIRA{sis_?h?h?h?h?h?h}'
 ```
 
+Mask napad (`-a 3`) je ciljani brute force: umjesto pogađanja riječi iz rječnika, nabrajaš *samo* nizove koji odgovaraju uzorku koji već znaš. Kako je oblik flaga fiksan, a varira samo 6 heks znakova, cijela pretraga je 16⁶ ≈ 17 milijuna kandidata — sekunde za MD5. To je opća pouka: sve što odaš o strukturi tajne smanjuje napadačevu pretragu, često drastično.
+
 > [!TIP]
 > **Čest problem.** `?h` je hashcatov skup znakova za mala heksadekadska slova. Svih 16⁶ kombinacija je nekoliko sekundi za MD5. "Token length exception" → višak razmaka u retku.
 
@@ -70,13 +82,13 @@ hashcat -m 0 -a 3 hashes_<MB>.txt 'ASPIRA{sis_?h?h?h?h?h?h}'
 
 ### 2.1 Isti napad protiv bcrypta
 
-Peti hash (`$2b$...`) je bcrypt jake lozinke — tako bi Flicker trebao pohranjivati.
+Peti hash (`$2b$...`) je bcrypt jake lozinke — tako bi Flicker trebao pohranjivati. Pokrećeš *isti* dictionary napad kao prije; promijenila se samo hash funkcija. Ta jedna promjena je cijela poanta vježbe.
 
 ```bash
 hashcat -m 3200 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt
 ```
 
-Pusti ~1 minutu, pa prekini (`q`). Zabilježi broj pokušaja u sekundi i usporedi s MD5-om.
+Pusti ~1 minutu, pa prekini (`q`). Zabilježi broj pokušaja u sekundi i usporedi s MD5-om. bcrypt je spor *namjerno*: njegov cost faktor prisiljava tisuće internih rundi po pokušaju, pa isti hardver koji je testirao milijarde MD5 pokušaja u sekundi sad stiže samo desetke.
 
 > [!NOTE]
 > **Očekivano.** MD5: milijuni/milijarde H/s → trenutno. bcrypt: desetci H/s → rječnik od 14 milijuna lozinki trajao bi danima. Hash se **ne razbije** u vremenu vježbe.
