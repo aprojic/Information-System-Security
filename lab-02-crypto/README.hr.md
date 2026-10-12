@@ -38,6 +38,30 @@ openssl version
 python3 -c "import cryptography; print('cryptography', cryptography.__version__)"
 ```
 
+## Pozadina — enkripcija u minuti
+
+Enkripcija bi trebala šifrat učiniti nerazlučivim od slučajnog šuma i raspasti se čim ga netko dira — no to su jamstva koja zaslužuješ *načinom* na koji koristiš šifru, a ne riječju „enkriptirano". Flickerov programer prekršio ih je na dva klasična načina. **ECB način** svaki blok šifrira zasebno, pa identični blokovi otvorenog teksta postaju identičan šifrat i oblik podataka vidi se naskroz — bez ključa. **XOR s kratkim, ponavljajućim ključem** još je slabiji: čim znaš komad otvorenog teksta, možeš ga oduzeti, vratiti ključ i dešifrirati ostatak. A kako nijedna shema ne nosi **provjeru integriteta**, napadač može i preokrenuti bajtove u prijenosu, a ništa to ne primijeti.
+
+Nije riječ o izmišljenom propustu. U Adobeovom curenju dobrano preko sto milijuna lozinki bilo je **enkriptirano 3DES-om u ECB načinu umjesto hashirano**, pa su identične lozinke davale identičan šifrat; uz neenkriptirane podsjetnike na lozinku, najčešće lozinke izvučene su u satima. Rješenje je odluka oko koje se vrti cijela vježba: ne slaži kripto od sirovih primitiva, nego posegni za provjerenom **AEAD** šifrom poput **AES-GCM-a**, koja povjerljivost *i* integritet daje zajedno. Slučajan nonce čini da se identične poruke šifriraju drukčije, a oznaka autentičnosti čini da svaka izmjena padne glasno umjesto da se dešifrira u smeće.
+
+```mermaid
+flowchart LR
+  subgraph slaba["Domaća kripto (slomljena)"]
+    direction LR
+    A1["blok A"] --> C["identičan šifrat"]
+    A2["blok A"] --> C
+  end
+  subgraph aead["AES-GCM (AEAD)"]
+    direction LR
+    M["poruka + slučajan nonce"] --> E["jedinstven šifrat + oznaka"]
+    E --> K{"oznaka valjana?"}
+    K -->|ne| X["izmjena uhvaćena"]
+    K -->|da| P["poruka"]
+  end
+```
+
+Lijeva strana je cijeli propust — odaj strukturu ili ponovi ključ i napadač pobijedi, a da ga nikad ne drži u ruci. Desna strana je ono što gradiš u Dijelu 2: ista se poruka svaki put šifrira drukčije, a svaka izmjena padne glasno umjesto da prođe neopaženo.
+
 ## Dio 1 — Ofenzivno: razbijanje slabe kripto · ~40 min
 
 ### 1.1 ECB otkriva strukturu
@@ -61,6 +85,8 @@ Tvoja datoteka `vault_<MB>.b64` je Base64. Dekodiraj je i pogledaj sirove bajtov
 base64 -d vault_<MB>.b64 | xxd
 ```
 
+Base64 je **kodiranje, ne enkripcija** — nema ključa, pa svatko može pokrenuti `base64 -d` i dobiti sirove bajtove natrag. Dekodiranje samo skida taj vanjski sloj; koju god (slabu) šifru je Flicker primijenio ispod, nju tek trebaš razbiti.
+
 Otvoreni tekst je flag **poznatog oblika** `ASPIRA{sis_crypto_XXXXXX}` (6 heksadekadskih znakova). Flicker ga je „enkriptirao" XOR-anjem s **kratkim ponavljajućim ključem**, pa rezultat Base64-ao. Budući da već znaš prvih 18 bajtova otvorenog teksta (`ASPIRA{sis_crypto_`), ključ možeš vratiti XOR-anjem poznatog otvorenog teksta sa šifratom — **napad s poznatim otvorenim tekstom**:
 
 ```python
@@ -70,6 +96,8 @@ known = b"ASPIRA{sis_crypto_"                    # javni prefiks flaga (18 bajto
 ks = bytes(c ^ p for c, p in zip(ct, known))     # vraćeni keystream za tih 18 bajtova
 print(ks.hex())   # pogledaj pažljivo: bajtovi se počinju ponavljati
 ```
+
+XOR je sam sebi inverz: iz `šifrat = otvoreni tekst ⊕ ključ` slijedi `šifrat ⊕ otvoreni tekst = ključ`, pa ti bilo koja dva od to troje daju treće. Upravo zato jednokratni ključ mora biti dug kao poruka i nikad ponovljen — kratak ponavljajući ključ ti preda cijeli period keystreama čim znaš odgovarajući komad otvorenog teksta.
 
 > [!TIP]
 > **Nađi period.** Vraćeni bajtovi se ponavljaju — na kojem se offsetu uzorak ponovno pokrene? Taj offset je **duljina ključa**. Uzmi toliko bajtova kao ključ i XOR-aj ga (ponavljajući) preko *cijelog* šifrata da dešifriraš sve — uključujući 6 heksadekadskih znakova koje nisi znao.
@@ -103,6 +131,8 @@ print("ct   :", base64.b64encode(ct).decode())
 print("plain:", aes.decrypt(nonce, ct, None).decode())
 ```
 
+Tri sastojka ovdje nose teret, svaki ubija po jedan trik iz Dijela 1. **PBKDF2** ljudsku zaporku sporo rasteže u ravnomjerno slučajan ključ, pa je pogađanje skupo; **slučajan nonce** čini da se ista poruka svaki put šifrira u drukčiji šifrat (svojstvo koje je ECB-u nedostajalo); a **oznaka autentičnosti** veže šifrat tako da se izmjena uhvati (integritet koji XOR nikad nije imao).
+
 > [!NOTE]
 > **Očekivano.** Pokreni dvaput → šifrat je **svaki put drukčiji** (slučajni salt + nonce), za razliku od ECB/XOR-a, i `xxd` ne pokazuje ponavljajuće blokove.
 
@@ -114,6 +144,8 @@ Promijeni jedan bajt šifrata i pokušaj dešifrirati:
 bad = bytearray(ct); bad[-1] ^= 1
 aes.decrypt(nonce, bytes(bad), None)   # baca cryptography.exceptions.InvalidTag
 ```
+
+Bez oznake je šifrat **podatljiv**: napadač koji ne može pročitati tvoju poruku i dalje je može urediti, a s XOR-om ili stream šifrom ta izmjena mijenja otvoreni tekst na predvidljiv način. Integritet nije opcionalni dodatak — zato AEAD oznaku autentičnosti ugrađuje u samu šifru.
 
 > [!NOTE]
 > **Očekivano.** Dešifriranje baca **`InvalidTag`** — GCM autenticira podatke, pa se neovlaštena izmjena otkriva umjesto da se tiho vrati smeće.
