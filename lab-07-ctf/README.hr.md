@@ -93,7 +93,7 @@ Kratko (5–7 rečenica): **zadržavanje, čišćenje, oporavak**, te što bi sp
 
 ## Predaja
 
-- `vjezba06_<MB>.pdf` — CTF izazovi + Score Board screenshot, analiza incidenta (faze, IOC-ovi, flag, plan odgovora).
+- `vjezba07_<MB>.pdf` — CTF izazovi + Score Board screenshot, analiza incidenta (faze, IOC-ovi, flag, plan odgovora).
 - **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
