@@ -33,6 +33,22 @@ docker compose up -d
 
 Otvori `http://localhost:3000` i **registriraj račun s e-mailom koji sadrži tvoj matični broj**.
 
+## Pozadina — kako pristupiti u minuti
+
+CTF (Capture The Flag) je standardni praktični format za vježbanje ofenzivne sigurnosti: dobiješ namjerno pokvaren sustav i dokazuješ da razumiješ propust tako da ga stvarno iskoristiš i izvučeš skriveni token — flag. Istraga incidenta je zrcalna slika: umjesto da ti postaviš propust, rekonstruiraš što je napadač već napravio, iz tragova koje je ostavio. Ova završna vježba spaja obje uloge u isti dan jer stvarni sigurnosni posao točno tako i izgleda — crveni tim, pa plavi tim. Ništa ovdje nije posve nova tehnika: svaki je izazov varijacija vještine iz ranijih vježbi — hashiranje i kriptografija, čitanje mrežnog prometa, web injection i broken access control, exploitation. Teško više nije „kako ovaj napad radi", nego „koja od stvari koje već znam ovdje pali". Upravo to prepoznavanje, sam, provjerava ova završna vježba.
+
+Razliku između rješavanja i lupanja naslijepo čini metoda, a metoda je kratka petlja koju ponavljaš. Prvo enumeracija: mapiraj sve što meta izlaže — stranice, parametre, portove, retke zapisnika — jer ne možeš iskoristiti ni objasniti ono što nisi primijetio. Iz onoga što vidiš složi jednu konkretnu hipotezu („ovo polje izgleda nefiltrirano", „ovaj jedan IP radi nesrazmjerno mnogo zahtjeva"), pa posegni za jednim alatom koji testira baš to i ništa više. Što god se vrati — flag, greška ili novi trag — zapiši odmah, zajedno s naredbom koja ga je dala, da izvještaj bude nusprodukt rada, a ne mučna rekonstrukcija poslije. Pogrešna hipoteza i dalje sužava prostor, pa se vrati na enumeraciju s onim što si upravo naučio. Zato struktura pobjeđuje pogađanje: nasumično bockanje se ne zbraja, a svaka dokumentirana runda nešto isključuje i pretraga se stvarno smanjuje — plavi tim vrti istu petlju i završava zadržavanjem, čišćenjem i oporavkom koje opisuješ na kraju.
+
+```mermaid
+flowchart LR
+  E["Enumeracija: mapiraj što meta izlaže"] --> H["Hipoteza: jedna konkretna pretpostavka"]
+  H --> T["Test: jedan alat koji baš to provjerava"]
+  T --> C{"Flag ili dokaz?"}
+  C -->|"ne, novi trag"| E
+  C -->|"da"| D["Zapiši"]
+  D -->|"sljedeći izazov"| E
+```
+
 ## Dio 1 — Crveni tim: CTF · ~40 min
 
 Pronađi *Score Board* i riješi **najmanje 4 izazova iz barem 3 kategorije** (npr. injection, XSS, broken access control, sensitive data). Za svaki: naziv, kategorija, kratak opis. **U izvještaj:** screenshot Score Boarda s riješenim izazovima i tvojim računom.

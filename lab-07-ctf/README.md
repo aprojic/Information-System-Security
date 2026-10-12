@@ -33,6 +33,22 @@ docker compose up -d
 
 Open `http://localhost:3000` and **register an account with an email containing your student ID**.
 
+## Background — how to approach this in one minute
+
+A CTF — Capture The Flag — is a standard hands-on way to practise offensive security: you're put in front of a deliberately broken system and prove you understand a flaw by actually exploiting it to recover a hidden token, the flag. An incident investigation is the mirror image: instead of planting the flaw you reconstruct what an attacker already did, from the traces they left behind. This capstone runs both halves in one day because real security work is exactly that pairing — red team, then blue team. Nothing here is a brand-new technique; every challenge is a variation on a skill from an earlier lab — hashing and crypto, reading network traffic, web injection and broken access control, exploitation. The hard part is no longer "how does this attack work" but "which of the things I already know applies here". That recognition, done on your own, is what the capstone tests.
+
+The difference between solving and flailing is method, and the method is a short loop you repeat. First enumerate: map everything the target exposes — pages, parameters, ports, log lines — because you can't exploit or explain what you haven't noticed. From what you see form one concrete hypothesis ("this field looks unsanitised", "this one IP makes far too many requests"), then reach for the single tool that tests exactly that and nothing more. Write down whatever comes back — a flag, an error, a new clue — with the command that produced it, so the report is a byproduct of the work instead of an afterthought. A wrong hypothesis still narrows the space, so loop back to enumerate with what you just learned. This is why structure beats guessing: random pokes don't accumulate, while each documented round rules something out and the search shrinks — and the blue-team half runs this same loop, ending in the containment, eradication and recovery you write up at the close.
+
+```mermaid
+flowchart LR
+  E["Enumerate: map what the target exposes"] --> H["Hypothesis: one concrete guess"]
+  H --> T["Test: the single matching tool"]
+  T --> C{"Flag or evidence?"}
+  C -->|"no, new clue"| E
+  C -->|"yes"| D["Document it"]
+  D -->|"next challenge"| E
+```
+
 ## Part 1 — Red team: CTF · ~40 min
 
 Find the *Score Board* and solve **at least 4 challenges from at least 3 categories** (e.g. injection, XSS, broken access control, sensitive data). For each: name, category, short description. **In the report:** a Score Board screenshot showing the solved challenges and your student-ID account.
