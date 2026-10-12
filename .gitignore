@@ -4,7 +4,7 @@
 _lab-env/flaggen/out/
 **/KEY*.csv
 **/out/
-# Generirano iz uputa (PDF/HTML žive na Merlinu)
+# PDF izvještaji studenata se ne commitaju
 *.pdf
 # Snimke, Python cache
 *.cast
