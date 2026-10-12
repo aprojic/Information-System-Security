@@ -43,6 +43,23 @@ Web stranica mora provjeriti tvoju lozinku, a da je nikad *ne pohrani*, jer svak
 
 Zato razbijanje procurenog hasha znači **pogađanje**: hashiraš kandidata, provjeriš poklapa li se otisak, ponoviš. Koliko je curenje zapravo opasno ovisi o jednoj stvari — koliko *brzo* napadač može vrtjeti tu petlju — a to je inženjerska odluka koju je stranica donijela biranjem hash funkcije. **Brza** funkcija (MD5, SHA-1) napadaču omogućuje milijarde pokušaja u sekundi; namjerno **spora** (bcrypt, argon2) samo nekoliko tisuća. Nije akademski: curenja LinkedIna (2012.) i Adobea objavila su stotine milijuna loše hashiranih lozinki koje su razbijene masovno. U ovoj vježbi igraš obje strane — MD5 hasheve isprazniš u sekundama, pa gledaš kako isti napad zapinje na bcryptu.
 
+```mermaid
+flowchart LR
+  subgraph store["Pohrana lozinke (jednosmjerno)"]
+    direction LR
+    P["lozinka"] -->|hash funkcija| H["pohranjeni hash"]
+  end
+  subgraph crack["Razbijanje procurenog hasha (petlja pogađanja)"]
+    direction LR
+    G["pogodi riječ"] -->|ista hash funkcija| GH["hash pogotka"]
+    GH --> M{"= procureni hash?"}
+    M -->|ne| G
+    M -->|da| F["lozinka pronađena"]
+  end
+```
+
+Brzina hash funkcije *je* brzina petlje: brzi MD5 napadač vrti milijarde puta u sekundi, spori bcrypt samo desetke. Upravo tu razliku mjeriš u Dijelu 2.
+
 ## Dio 1 — Ofenzivno: razbijanje lozinki · ~40 min
 
 ### 1.1 Identifikacija hasheva
