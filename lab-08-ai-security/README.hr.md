@@ -104,7 +104,7 @@ Filtar na točan niz hvata flag napisan samo na jedan način, pa ne može pokrit
 
 ## Predaja
 
-- `vjezba07_<MB>.pdf` — pokušaji s odgovorima, izvučeni flag, zaobilazak filtra, obrambeni osvrt.
+- `vjezba08_<MB>.pdf` — pokušaji s odgovorima, izvučeni flag, zaobilazak filtra, obrambeni osvrt.
 - **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
