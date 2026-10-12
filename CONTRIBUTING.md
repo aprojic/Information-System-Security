@@ -20,7 +20,7 @@ A good fix to a lab instruction may be mentioned in class (with your permission)
 
 ## How lab instructions are written
 
-Each lab is one folder with a `README.md` (English) and `README.hr.md` (Croatian). The same file is turned into the PDF on Merlin, so please keep the conventions from [`.github/lab-template.md`](.github/lab-template.md):
+Each lab is one folder with a `README.md` (English) and `README.hr.md` (Croatian), rendered on GitHub for students, so please keep the conventions from [`.github/lab-template.md`](.github/lab-template.md):
 
 | Use | For |
 |---|---|

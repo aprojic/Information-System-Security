@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/license-CC%20BY%204.0-0E1116?style=flat-square" alt="License CC BY 4.0">
 </p>
 
-Hands-on labs for **Sigurnost informacijskih sustava / Information System Security** at Aspira University of Applied Sciences, Split. Every lab pairs an **offensive** half (perform the attack) with a **defensive** half (detect it or fix it). Each lab's instructions live here; the same text is on **Merlin** as a PDF, and you **submit on Merlin**.
+Hands-on labs for **Sigurnost informacijskih sustava / Information System Security** at Aspira University of Applied Sciences, Split. Every lab pairs an **offensive** half (perform the attack) with a **defensive** half (detect it or fix it). Each lab's instructions live here on GitHub, and you **submit on Merlin**.
 
 > [!WARNING]
 > These labs contain **intentionally vulnerable** software and offensive tools. Use them **only inside your own lab environment**, never against real systems or other people's accounts — that is a criminal offence in Croatia and the EU.
@@ -48,9 +48,9 @@ A copied flag won't match your student ID, so it won't count. Full student guide
 
 ## 📁 What's inside
 
-- `lab-NN-*/` — each lab: `README.md` (English) and `README.hr.md` (Croatian) instructions + its `compose.yml` / target files. The README is the single source: GitHub renders it, and `tools/build-pdf.sh lab-NN/README.md` produces the styled Merlin PDF from the same file.
+- `lab-NN-*/` — each lab: `README.md` (English) and `README.hr.md` (Croatian) instructions + its `compose.yml` / target files. The README is the single source, rendered on GitHub.
 - `_lab-env/` — the shared flag tooling: `flaglib.py` (flag formula), `flaggen/checker.py` (instructor answer key over the class roster), `flaggen/gen.py` (Lab 01 hash files). See [`_lab-env/README.md`](_lab-env/README.md).
-- `tools/` — `build-pdf.sh` + `ghmd2styled.py` + `handout.css` turn a lab README into the Merlin PDF (needs `apex`, Chrome, `python3`).
+- `tools/` — `build-pdf.sh` + `ghmd2styled.py` + `handout.css` can build a styled PDF from a lab README if you need an offline copy (needs `apex`, Chrome, `python3`).
 - `*/.env.example` — copy to `.env` and fill in; the real `.env`, PDFs and answer keys are **git-ignored** and never published.
 
 ## 📜 License
