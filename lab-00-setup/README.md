@@ -31,8 +31,9 @@ In this course you run both offensive and defensive techniques, but **never on r
 1. At [kali.org/get-kali](https://www.kali.org/get-kali/) → **Virtual Machines**, download the prebuilt VirtualBox image (`.7z`, e.g. `kali-linux-2026.2-virtualbox-amd64.7z`).
 2. Extract the `.7z`. You get a folder with a `.vbox` and a `.vdi` file.
 3. In VirtualBox: **Machine → Add…** and select the `.vbox` file. (This is a ready-made machine — do *not* use "Import Appliance" or "New".)
-4. Start the machine and log in — user **kali**, password **kali**.
-5. Open a terminal and check the tools are present:
+4. **Give the machine enough resources.** Select it → **Settings → System**: on **Motherboard** set **Base Memory to at least 4096 MB (4 GB)**, and on **Processor** set **at least 2 CPUs**. The prebuilt image often defaults to 2 GB / 1 CPU, which is **not enough** — the Docker targets and hashcat will crash, hang, or run out of memory.
+5. Start the machine and log in — user **kali**, password **kali**.
+6. Open a terminal and check the tools are present:
 
 ```bash
 hashcat --version
@@ -43,7 +44,7 @@ nmap --version
 > [!TIP]
 > **Common pitfall.** If the machine won't start or is slow, enable virtualization (VT-x / AMD-V) in BIOS/UEFI. If a tool is missing, pull the default set: `sudo apt update && sudo apt install -y kali-linux-default`.
 
-6. **Clean-state snapshot** (so you can always roll back): in VirtualBox, with the machine running → **Machine → Take Snapshot…**, name it `clean`.
+7. **Clean-state snapshot** (so you can always roll back): in VirtualBox, with the machine running → **Machine → Take Snapshot…**, name it `clean`.
 
 ## Part 2 — Docker inside Kali · ~20 min
 
