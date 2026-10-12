@@ -43,6 +43,23 @@ A website must check your password without ever *storing* it, because any databa
 
 That is why cracking a leaked hash means **guessing**: hash a candidate word, check if its fingerprint matches, repeat. How dangerous a leak really is comes down to one thing — how *fast* an attacker can run that loop — and that was an engineering decision the site made when it chose the hash function. A **fast** function (MD5, SHA-1) lets an attacker test billions of guesses per second; a deliberately **slow** one (bcrypt, argon2) only a few thousand. This is not academic: the LinkedIn (2012) and Adobe breaches leaked hundreds of millions of poorly hashed passwords that were cracked en masse. In this lab you play both sides — you'll empty the MD5 hashes in seconds, then watch the exact same attack stall against bcrypt.
 
+```mermaid
+flowchart LR
+  subgraph store["Storing a password (one-way)"]
+    direction LR
+    P["password"] -->|hash function| H["stored hash"]
+  end
+  subgraph crack["Cracking a leaked hash (guess loop)"]
+    direction LR
+    G["guess a word"] -->|same hash function| GH["hash of guess"]
+    GH --> M{"= leaked hash?"}
+    M -->|no| G
+    M -->|yes| F["password found"]
+  end
+```
+
+The hash function's speed *is* the loop's speed: fast MD5 lets the attacker run it billions of times a second, slow bcrypt only dozens. That single difference is what you measure in Part 2.
+
 ## Part 1 — Offensive: cracking passwords · ~40 min
 
 ### 1.1 Identify the hashes
