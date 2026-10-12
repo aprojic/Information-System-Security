@@ -26,6 +26,28 @@ U ovom kolegiju izvodiš i napadačke i obrambene tehnike, ali **nikad na stvarn
 > [!NOTE]
 > Na lab računalima Aspire okruženje je obično već pripremljeno. Ako radiš na svom laptopu, slijedi korake od početka.
 
+## Pozadina — tvoj laboratorij u minuti
+
+Cijela ova priprema postoji da svi dobiju jednako okruženje koje se smije pokvariti. Kali je mašina s koje napadaš — Linux distribucija koja već dolazi s ofenzivnim i obrambenim alatima iz ovih vježbi, pa nitko ne mora ručno tražiti i instalirati hashcat, nmap ili Wireshark jedan po jedan. Mete koje napadaš su namjerno ranjive aplikacije i vrte se kao Docker kontejneri *unutar* VM-a: svaka je jedan image koji podigneš jednom naredbom i baciš kad završiš. Kako meta nikad ne izlazi iz VM-a, napad na nju ne može dohvatiti tvoje datoteke, tvoju kućnu mrežu ni bilo koga drugog — šteta je zadržana po dizajnu.
+
+VM je granica kvara: izolira sve što ovdje radiš od tvog pravog operativnog sustava, a snapshot `clean` ti omogućuje da cijelu mašinu vratiš u poznato dobro stanje u par sekundi, umjesto ponovne instalacije. Još jedno što ćeš susretati od Vježbe 01: svaka vježba daje ti osobni flag vezan uz tvoj **matični broj**, pa flag prepisan od kolege jednostavno neće odgovarati tvojem — prepisivanje ne prolazi, jer je odgovor različit za svakog studenta.
+
+```mermaid
+flowchart LR
+  Host["Tvoje računalo (pravi OS)"]
+  subgraph vm["Kali VM (izolirani sandbox)"]
+    direction LR
+    Kali["Kali: napadački alati"]
+    subgraph docker["Docker"]
+      Target["ranjive mete"]
+    end
+    Kali -->|napad| Target
+  end
+  Host -->|VirtualBox| Kali
+```
+
+Ovu sliku slažeš jednom ovdje — Dio 1 podigne Kali VM, Dio 2 stavi Docker u njega — i svaka kasnija vježba napada iznutra, nikad izvana.
+
 ## Dio 1 — Kali u VirtualBoxu · ~25 min
 
 1. Na [kali.org/get-kali](https://www.kali.org/get-kali/) → **Virtual Machines** preuzmi gotov VirtualBox image (`.7z`, npr. `kali-linux-2026.2-virtualbox-amd64.7z`).
@@ -46,9 +68,13 @@ nmap --version
 
 7. **Snapshot čistog stanja** (da se uvijek možeš vratiti): u VirtualBoxu dok mašina radi → **Machine → Take Snapshot…**, nazovi ga `clean`.
 
+Napravi snapshot sad, dok je instalacija čista i ništa nije pokvareno: on zamrzne cijeli disk VM-a u ovom trenutku, pa poslije — kad neka vježba zatrpa Kali ili eksperiment krene po zlu — vraćanje na `clean` je jedan klik i par sekundi, a ne ponovna instalacija.
+
 ## Dio 2 — Docker u Kaliju · ~20 min
 
 Mete (od Vježbe 03 nadalje) vrte se kao Docker kontejneri unutar Kalija.
+
+Docker je to što mete drži jednokratnima i zatvorenima: svaka ranjiva aplikacija je gotov image koji podigneš jednom `docker run` / `docker compose` naredbom i poslije odbaciš (`--rm` ga briše pri izlasku), a kako kontejner radi *unutar* Kali VM-a, čak ni meta koju aktivno napadaš ne može dohvatiti tvoj host ni pravu mrežu. Zato ti vježbe daju gotovu `docker` naredbu umjesto da svaku ranjivu aplikaciju instaliraš ručno.
 
 1. Instaliraj Docker i pokreni servis:
 
