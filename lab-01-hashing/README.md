@@ -41,7 +41,7 @@ ls -l /usr/share/wordlists/rockyou.txt   # if needed: sudo gunzip /usr/share/wor
 
 A website must check your password without ever *storing* it, because any database can leak. So instead of the password it stores a **hash**: a one-way fingerprint computed by a function such as MD5 or bcrypt. The same input always produces the same hash, but there is no "undo" — you can't run the function backwards to recover the password. At login the site hashes what you typed and compares the two fingerprints.
 
-That is why cracking a leaked hash means **guessing**: hash a candidate word, check if its fingerprint matches, repeat. How dangerous a leak really is comes down to one thing — how *fast* an attacker can run that loop — and that was an engineering decision the site made when it chose the hash function. A **fast** function (MD5, SHA-1) lets an attacker test billions of guesses per second; a deliberately **slow** one (bcrypt, argon2) only a few thousand. This is not academic: the LinkedIn (2012) and Adobe breaches leaked hundreds of millions of poorly hashed passwords that were cracked en masse. In this lab you play both sides — you'll empty the MD5 hashes in seconds, then watch the exact same attack stall against bcrypt.
+That is why cracking a leaked hash means **guessing**: hash a candidate word, check if its fingerprint matches, repeat. How dangerous a leak really is comes down to one thing — how *fast* an attacker can run that loop — and that was an engineering decision the site made when it chose the hash function. A **fast** function (MD5, SHA-1) lets an attacker test billions of guesses per second; a deliberately **slow** one (bcrypt, argon2) only a few thousand. This is not academic: the LinkedIn breach leaked millions of **unsalted SHA-1** password hashes, and hundreds of thousands were cracked within days. In this lab you play both sides — you'll empty the MD5 hashes in seconds, then watch the exact same attack stall against bcrypt.
 
 ```mermaid
 flowchart LR
@@ -75,7 +75,7 @@ hashcat -m 0 -a 0 hashes_<ID>.txt /usr/share/wordlists/rockyou.txt
 hashcat -m 0 -a 0 hashes_<ID>.txt /usr/share/wordlists/rockyou.txt --show
 ```
 
-A dictionary attack (`-a 0`) simply hashes every word in a huge list of real passwords and compares each one against your hashes. `rockyou.txt` is ~14 million passwords leaked from a real 2009 breach — if a user picked anything common, it's in there. Against a fast hash like MD5 the whole list runs in under a second, which is exactly why MD5 must never be used to store passwords.
+A dictionary attack (`-a 0`) simply hashes every word in a huge list of real passwords and compares each one against your hashes. `rockyou.txt` is ~14 million passwords leaked from a real website breach — if a user picked anything common, it's in there. Against a fast hash like MD5 the whole list runs in under a second, which is exactly why MD5 must never be used to store passwords.
 
 > [!NOTE]
 > **Expected.** The three MD5 hashes fall almost instantly. hashcat ignores the bcrypt hash here (it isn't mode 0); you may see a `Token length exception` for that line — expected, it's the bcrypt hash being skipped.
