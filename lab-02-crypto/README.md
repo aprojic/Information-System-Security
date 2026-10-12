@@ -38,6 +38,30 @@ openssl version
 python3 -c "import cryptography; print('cryptography', cryptography.__version__)"
 ```
 
+## Background — encryption in one minute
+
+Encryption is supposed to make ciphertext look like random noise and to fall apart the instant someone tampers with it — but those are guarantees you earn from *how* you use a cipher, not from the word "encrypted". Flicker's developer broke them in two classic ways. **ECB mode** encrypts each block on its own, so identical plaintext blocks become identical ciphertext and the data's shape shows straight through — no key required. **XOR with a short, repeating key** is weaker still: the moment you know a stretch of plaintext you can subtract it out, recover the key, and decrypt the rest. And because neither scheme carries an **integrity check**, an attacker can also flip bytes in transit and nothing detects it.
+
+This is not a contrived failure. In the Adobe breach, well over a hundred million account passwords were **encrypted with 3DES in ECB mode instead of hashed**, so identical passwords produced identical ciphertext; stored alongside unencrypted password hints, the most common ones were recovered within hours. The fix is the decision this whole lab turns on: don't assemble crypto from raw primitives, reach for a vetted **AEAD** cipher such as **AES-GCM**, which delivers confidentiality *and* integrity together. A random nonce makes identical messages encrypt differently, and an authentication tag makes any tampering fail loudly instead of decrypting to garbage.
+
+```mermaid
+flowchart LR
+  subgraph weak["Homemade crypto (broken)"]
+    direction LR
+    A1["block A"] --> C["identical ciphertext"]
+    A2["block A"] --> C
+  end
+  subgraph aead["AES-GCM (AEAD)"]
+    direction LR
+    M["message + random nonce"] --> E["unique ciphertext + tag"]
+    E --> K{"tag valid?"}
+    K -->|no| X["tampering caught"]
+    K -->|yes| P["message"]
+  end
+```
+
+The left side is the entire failure — leak structure or reuse a key and the attacker wins without ever holding it. The right side is what you build in Part 2: the same message encrypts differently every time, and any tampering fails loudly instead of slipping through.
+
 ## Part 1 — Offensive: breaking weak crypto · ~40 min
 
 ### 1.1 ECB leaks structure
@@ -61,6 +85,8 @@ Your file `vault_<ID>.b64` is Base64. Decode it and look at the raw bytes:
 base64 -d vault_<ID>.b64 | xxd
 ```
 
+Base64 is **encoding, not encryption** — it has no key, so anyone can run `base64 -d` and get the raw bytes back. Decoding only strips that outer layer; whatever (weak) cipher Flicker applied underneath is still what you have to break.
+
 The plaintext is a flag of the **known form** `ASPIRA{sis_crypto_XXXXXX}` (6 hex chars). Flicker "encrypted" it by XOR-ing with a **short repeating key**, then Base64-ing the result. Because you already know the first 18 bytes of plaintext (`ASPIRA{sis_crypto_`), you can recover the key by XOR-ing known plaintext against the ciphertext — a **known-plaintext attack**:
 
 ```python
@@ -70,6 +96,8 @@ known = b"ASPIRA{sis_crypto_"                    # the public flag prefix (18 by
 ks = bytes(c ^ p for c, p in zip(ct, known))     # recovered keystream for those 18 bytes
 print(ks.hex())   # look closely: the bytes start repeating
 ```
+
+XOR is its own inverse: from `ciphertext = plaintext ⊕ key` it follows that `ciphertext ⊕ plaintext = key`, so any two of the three give you the third. That is exactly why a one-time key must be as long as the message and never reused — a short repeating key hands you a full period of keystream the instant you know a matching stretch of plaintext.
 
 > [!TIP]
 > **Find the period.** The recovered bytes repeat — at what offset does the pattern restart? That offset is your **key length**. Take that many bytes as the key and XOR it (repeating) over the *whole* ciphertext to decrypt everything — including the 6 hex characters you didn't know.
@@ -103,6 +131,8 @@ print("ct   :", base64.b64encode(ct).decode())
 print("plain:", aes.decrypt(nonce, ct, None).decode())
 ```
 
+Three ingredients carry the weight here, each killing one Part 1 trick. **PBKDF2** stretches a human passphrase into a uniformly random key slowly, so guessing it is expensive; the **random nonce** makes the same message encrypt to different ciphertext every time (the property ECB lacked); and the **authentication tag** binds the ciphertext so tampering is caught (the integrity XOR never had).
+
 > [!NOTE]
 > **Expected.** Run it twice → the ciphertext is **different each time** (random salt + nonce), unlike ECB/XOR, and `xxd` shows no repeating blocks.
 
@@ -114,6 +144,8 @@ Flip one byte of the ciphertext and try to decrypt:
 bad = bytearray(ct); bad[-1] ^= 1
 aes.decrypt(nonce, bytes(bad), None)   # raises cryptography.exceptions.InvalidTag
 ```
+
+Without a tag, ciphertext is **malleable**: an attacker who can't read your message can still edit it, and with XOR or a stream cipher that edit changes the plaintext in a predictable way. Integrity is not an optional add-on — it is why AEAD bundles the authentication tag into the cipher itself.
 
 > [!NOTE]
 > **Expected.** Decryption raises **`InvalidTag`** — GCM authenticates the data, so tampering is detected instead of silently returning garbage.
