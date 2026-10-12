@@ -31,8 +31,9 @@ U ovom kolegiju izvodiš i napadačke i obrambene tehnike, ali **nikad na stvarn
 1. Na [kali.org/get-kali](https://www.kali.org/get-kali/) → **Virtual Machines** preuzmi gotov VirtualBox image (`.7z`, npr. `kali-linux-2026.2-virtualbox-amd64.7z`).
 2. Raspakiraj `.7z`. Dobiješ mapu s datotekama `.vbox` i `.vdi`.
 3. U VirtualBoxu: **Machine → Add…** i odaberi `.vbox` datoteku. (Ovo je gotova mašina — *ne* koristi "Import Appliance" ni "New".)
-4. Pokreni mašinu i prijavi se — korisnik **kali**, lozinka **kali**.
-5. Otvori terminal i provjeri da su alati tu:
+4. **Dodijeli mašini dovoljno resursa.** Odaberi je → **Settings → System**: na **Motherboard** postavi **Base Memory na najmanje 4096 MB (4 GB)**, a na **Processor** **najmanje 2 CPU-a**. Gotov image često ima zadano 2 GB / 1 CPU, što **nije dovoljno** — Docker mete i hashcat će se srušiti, zablokirati ili ostati bez memorije.
+5. Pokreni mašinu i prijavi se — korisnik **kali**, lozinka **kali**.
+6. Otvori terminal i provjeri da su alati tu:
 
 ```bash
 hashcat --version
@@ -43,7 +44,7 @@ nmap --version
 > [!TIP]
 > **Čest problem.** Ako se mašina ne pokreće ili je spora, uključi virtualizaciju (VT-x / AMD-V) u BIOS/UEFI-u. Ako neki alat nedostaje: `sudo apt update && sudo apt install -y kali-linux-default`.
 
-6. **Snapshot čistog stanja** (da se uvijek možeš vratiti): u VirtualBoxu dok mašina radi → **Machine → Take Snapshot…**, nazovi ga `clean`.
+7. **Snapshot čistog stanja** (da se uvijek možeš vratiti): u VirtualBoxu dok mašina radi → **Machine → Take Snapshot…**, nazovi ga `clean`.
 
 ## Dio 2 — Docker u Kaliju · ~20 min
 
