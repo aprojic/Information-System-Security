@@ -26,6 +26,28 @@ In this course you run both offensive and defensive techniques, but **never on r
 > [!NOTE]
 > On the Aspira lab machines the environment is usually prepared already. If you work on your own laptop, follow the steps from the start.
 
+## Background — your lab in one minute
+
+This whole setup exists to give everyone an identical, throwaway environment they can safely attack in. Kali is the machine you attack *from* — a Linux distribution that already ships with the offensive and defensive tools these labs use, so nobody has to hunt down and install hashcat, nmap or Wireshark one at a time. The targets you attack are deliberately vulnerable apps, and they run as Docker containers *inside* the VM: each is a single image you bring up with one command and throw away when you're done. Because a target never leaves the VM, attacking it can't reach your real files, your home network, or anyone else — the damage is contained by design.
+
+The VM is the fault boundary: it isolates everything you do here from your real operating system, and a `clean` snapshot lets you roll the whole machine back to a known-good state in seconds instead of reinstalling. One thing you'll meet from Lab 01 on: each lab gives you a personal flag tied to your **student ID (matični broj)**, so a flag copied from a classmate simply won't match your own — copying can't pass, because the answer is different for every student.
+
+```mermaid
+flowchart LR
+  Host["Your computer (real OS)"]
+  subgraph vm["Kali VM (isolated sandbox)"]
+    direction LR
+    Kali["Kali: attack tools"]
+    subgraph docker["Docker"]
+      Target["vulnerable targets"]
+    end
+    Kali -->|attack| Target
+  end
+  Host -->|VirtualBox| Kali
+```
+
+You stand this picture up once here — Part 1 brings up the Kali VM, Part 2 puts Docker inside it — and every later lab attacks from within that box, never outside it.
+
 ## Part 1 — Kali in VirtualBox · ~25 min
 
 1. At [kali.org/get-kali](https://www.kali.org/get-kali/) → **Virtual Machines**, download the prebuilt VirtualBox image (`.7z`, e.g. `kali-linux-2026.2-virtualbox-amd64.7z`).
@@ -46,9 +68,13 @@ nmap --version
 
 7. **Clean-state snapshot** (so you can always roll back): in VirtualBox, with the machine running → **Machine → Take Snapshot…**, name it `clean`.
 
+Take the snapshot now, while the install is fresh and nothing is broken: it freezes the VM's whole disk at this moment, so whenever a later lab clutters Kali or an experiment goes wrong, restoring `clean` is one click and a few seconds — not a full reinstall.
+
 ## Part 2 — Docker inside Kali · ~20 min
 
 Targets (from Lab 03 onward) run as Docker containers inside Kali.
+
+Docker is what keeps those targets disposable and contained: each vulnerable app is a prebuilt image you bring up with a single `docker run` / `docker compose` command and discard afterwards (`--rm` deletes it on exit), and because the container runs *inside* the Kali VM, even a target you are actively exploiting can't reach your host or the real network. That's why the labs hand you a `docker` command instead of asking you to install each vulnerable app by hand.
 
 1. Install Docker and start the service:
 
