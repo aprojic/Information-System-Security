@@ -74,7 +74,7 @@ print(ks.hex())   # pogledaj pažljivo: bajtovi se počinju ponavljati
 > [!TIP]
 > **Nađi period.** Vraćeni bajtovi se ponavljaju — na kojem se offsetu uzorak ponovno pokrene? Taj offset je **duljina ključa**. Uzmi toliko bajtova kao ključ i XOR-aj ga (ponavljajući) preko *cijelog* šifrata da dešifriraš sve — uključujući 6 heksadekadskih znakova koje nisi znao.
 
-**U izvještaj:** vraćeni ključ (hex), **tvoj flag** i naredbe/kôd koje si koristio (asciinema snimka je log procesa).
+**U izvještaj:** vraćeni ključ (hex), **tvoj flag** i naredbe/kôd koje si koristio.
 
 ## Dio 2 — Defenzivno: enkripcija koja drži · ~25 min
 
@@ -135,7 +135,6 @@ aes.decrypt(nonce, bytes(bad), None)   # baca cryptography.exceptions.InvalidTag
 ## Predaja
 
 - `vjezba02_<MB>.pdf` — izvještaj s `xxd` ECB nalazom, vraćenim ključem i **tvojim flagom**, AES-GCM izlazom, testom integriteta i obrambenim osvrtom.
-- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba02.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
 
 ## Bodovanje
 
