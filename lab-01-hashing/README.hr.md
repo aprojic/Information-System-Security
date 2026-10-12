@@ -41,7 +41,7 @@ ls -l /usr/share/wordlists/rockyou.txt   # po potrebi: sudo gunzip /usr/share/wo
 
 Web stranica mora provjeriti tvoju lozinku, a da je nikad *ne pohrani*, jer svaka baza može procuriti. Zato umjesto lozinke sprema **hash**: jednosmjerni otisak koji računa funkcija poput MD5 ili bcrypta. Isti ulaz uvijek daje isti hash, ali nema „undo" — funkciju ne možeš pokrenuti unatrag da vratiš lozinku. Pri prijavi stranica hashira ono što si upisao i usporedi dva otiska.
 
-Zato razbijanje procurenog hasha znači **pogađanje**: hashiraš kandidata, provjeriš poklapa li se otisak, ponoviš. Koliko je curenje zapravo opasno ovisi o jednoj stvari — koliko *brzo* napadač može vrtjeti tu petlju — a to je inženjerska odluka koju je stranica donijela biranjem hash funkcije. **Brza** funkcija (MD5, SHA-1) napadaču omogućuje milijarde pokušaja u sekundi; namjerno **spora** (bcrypt, argon2) samo nekoliko tisuća. Nije akademski: curenja LinkedIna (2012.) i Adobea objavila su stotine milijuna loše hashiranih lozinki koje su razbijene masovno. U ovoj vježbi igraš obje strane — MD5 hasheve isprazniš u sekundama, pa gledaš kako isti napad zapinje na bcryptu.
+Zato razbijanje procurenog hasha znači **pogađanje**: hashiraš kandidata, provjeriš poklapa li se otisak, ponoviš. Koliko je curenje zapravo opasno ovisi o jednoj stvari — koliko *brzo* napadač može vrtjeti tu petlju — a to je inženjerska odluka koju je stranica donijela biranjem hash funkcije. **Brza** funkcija (MD5, SHA-1) napadaču omogućuje milijarde pokušaja u sekundi; namjerno **spora** (bcrypt, argon2) samo nekoliko tisuća. Nije akademski: curenje LinkedIna otkrilo je milijune **nesoljenih SHA-1** hasheva lozinki, a stotine tisuća razbijene su u par dana. U ovoj vježbi igraš obje strane — MD5 hasheve isprazniš u sekundama, pa gledaš kako isti napad zapinje na bcryptu.
 
 ```mermaid
 flowchart LR
@@ -75,7 +75,7 @@ hashcat -m 0 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt
 hashcat -m 0 -a 0 hashes_<MB>.txt /usr/share/wordlists/rockyou.txt --show
 ```
 
-Dictionary napad (`-a 0`) jednostavno hashira svaku riječ iz ogromne liste stvarnih lozinki i svaku usporedi s tvojim hashevima. `rockyou.txt` je ~14 milijuna lozinki procurjelih iz stvarnog curenja 2009. — ako je korisnik izabrao bilo što uobičajeno, tu je. Protiv brzog hasha poput MD5 cijela lista prođe za manje od sekunde, i upravo zato se MD5 nikad ne smije koristiti za pohranu lozinki.
+Dictionary napad (`-a 0`) jednostavno hashira svaku riječ iz ogromne liste stvarnih lozinki i svaku usporedi s tvojim hashevima. `rockyou.txt` je ~14 milijuna lozinki procurjelih iz stvarnog curenja web stranice — ako je korisnik izabrao bilo što uobičajeno, tu je. Protiv brzog hasha poput MD5 cijela lista prođe za manje od sekunde, i upravo zato se MD5 nikad ne smije koristiti za pohranu lozinki.
 
 > [!NOTE]
 > **Očekivano.** Tri MD5 hasha pucaju gotovo trenutno. hashcat ovdje ignorira bcrypt hash (nije mode 0); za taj redak može javiti `Token length exception` — to je u redu, bcrypt se preskače.
