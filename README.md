@@ -50,8 +50,7 @@ A copied flag won't match your student ID, so it won't count. Full student guide
 
 - `lab-NN-*/` — each lab: `README.md` (English) and `README.hr.md` (Croatian) instructions + its `compose.yml` / target files. The README is the single source, rendered on GitHub.
 - `_lab-env/` — the shared flag tooling: `flaglib.py` (flag formula), `flaggen/checker.py` (instructor answer key over the class roster), `flaggen/gen.py` (Lab 01 hash files). See [`_lab-env/README.md`](_lab-env/README.md).
-- `tools/` — `build-pdf.sh` + `ghmd2styled.py` + `handout.css` can build a styled PDF from a lab README if you need an offline copy (needs `apex`, Chrome, `python3`).
-- `*/.env.example` — copy to `.env` and fill in; the real `.env`, PDFs and answer keys are **git-ignored** and never published.
+- `*/.env.example` — copy to `.env` and fill in; the real `.env` and answer keys are **git-ignored** and never published.
 
 ## 📜 License
 
