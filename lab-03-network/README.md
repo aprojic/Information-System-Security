@@ -27,11 +27,28 @@
 
 ## Setup · ~10 min
 
+Get the lab files into Kali. You clone the repository only once: from Lab 04 on, run `cd ~/Information-System-Security && git pull` and go into the new lab's folder.
+
+```bash
+sudo apt update && sudo apt install -y git asciinema
+git clone https://github.com/aprojic/Information-System-Security.git ~/Information-System-Security
+cd ~/Information-System-Security/lab-03-network
+```
+
+Start recording your work (required for the submission). Everything you type in this terminal is recorded until you press `Ctrl-D` at the end of the lab, so keep working in it:
+
+```bash
+asciinema rec lab.cast
+```
+
 Bring up the target and open it (`http://localhost:4280`, login `admin` / `password`, then *Create / Reset Database*):
 
 ```bash
 docker compose up -d
 ```
+
+> [!TIP]
+> **Common pitfall.** `no configuration file provided: not found` means you are not in the lab folder: `cd ~/Information-System-Security/lab-03-network` and try again.
 
 Start Wireshark capturing on interface **`lo`**, display filter: `http || tcp.flags.syn==1`.
 
@@ -91,16 +108,22 @@ sudo nmap -sS -p 1-1000 localhost
 ## Part 2 — Defensive: detection & protection · ~30 min
 
 ### 2.1 Spot the scan
-Save the capture (`cap.pcapng`) and count SYNs per source and port:
+Save the capture (`cap.pcapng`) and list the SYNs per source and port, busiest first:
 
 ```bash
 tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e ip.src -e tcp.dstport | sort | uniq -c | sort -rn | head
 ```
 
-The filter keeps only packets with SYN set and ACK clear — the opening packet of a connection — then tallies them per source and destination port. A normal client opens a handful of connections; a scanner stands out as one source touching hundreds of ports, which is why sorting by count makes it obvious at a glance.
+Then count how many different ports received a SYN:
+
+```bash
+tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e tcp.dstport | sort -u | wc -l
+```
+
+The filter keeps only packets with SYN set and ACK clear — the opening packet of a connection. The top of the first list is your own browsing: a few connections to port 4280 (a line with an empty source is the same traffic over IPv6, `::1`). Below it runs a long tail of ports that got a single SYN each, and the second command measures that tail. On `lo` everything comes from the same machine, so the address can't separate the scanner from your browser; the number of ports can — a normal client talks to a handful, a scanner to hundreds.
 
 > [!NOTE]
-> **Expected.** One source sends SYNs to hundreds of ports in a short time, with no completed handshakes — the signature of a SYN scan.
+> **Expected.** The second command prints about 1000: one source sent SYNs to hundreds of ports in a short time, with no completed handshakes — the signature of a SYN scan.
 
 ### 2.2 Why the defence works
 Briefly (3–5 sentences): why **TLS** would make the login from 1.1 unreadable, and how an **IDS/firewall** would notice the scan.
@@ -116,7 +139,7 @@ Briefly (3–5 sentences): why **TLS** would make the login from 1.1 unreadable,
 
 - `lab03_<ID>.pdf` — screenshots of the interception and the ID packet, the `tshark` count output, the defensive write-up.
 - The capture `cap.pcapng` (or an excerpt).
-- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; your ID in the traffic only shows whose work it is, this recording is the proof of work.
 
 ## Grading
 
