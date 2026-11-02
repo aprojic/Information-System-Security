@@ -2,9 +2,22 @@
 # Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:4280  (admin / password)
 #   U DVWA-u: Create/Reset Database, pa DVWA Security postavi na "Low" (kasnije "Medium").
 # Zaustavljanje:          docker compose down
+# DVWA image nema bazu, pa uz nju ide MariaDB (isto kao službeni DVWA compose).
 services:
   dvwa:
     image: ghcr.io/digininja/dvwa:latest
+    environment:
+      DB_SERVER: db
+    depends_on:
+      - db
     ports:
       - "4280:80"
+    restart: unless-stopped
+  db:
+    image: docker.io/library/mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: dvwa
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: p@ssw0rd
     restart: unless-stopped
