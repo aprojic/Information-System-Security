@@ -41,16 +41,26 @@ Start recording your work (required for the submission). Everything you type in 
 asciinema rec lab.cast
 ```
 
-Bring up the target and open it (`http://localhost:4280`, login `admin` / `password`, then *Create / Reset Database*):
+The target is **DVWA** (*Damn Vulnerable Web Application*), a web app built to be insecure on purpose so you can practise attacks on it legally. Here it plays Flicker's internal app: a login page served over plain HTTP. It runs in a Docker container described in this folder's `compose.yml`. Start it:
 
 ```bash
 docker compose up -d
 ```
 
+Open `http://localhost:4280` in Firefox. On first start DVWA has to create its database: log in with `admin` / `password`, then on the setup page click **Create / Reset Database** at the bottom. When it reports success, go to `http://localhost:4280/login.php` and leave the login page open — you will log in again in 1.1, this time while Wireshark is capturing.
+
 > [!TIP]
 > **Common pitfall.** `no configuration file provided: not found` means you are not in the lab folder: `cd ~/Information-System-Security/lab-03-network` and try again.
 
-Start Wireshark capturing on interface **`lo`**, display filter: `http || tcp.flags.syn==1`.
+**Wireshark** records every packet that crosses a network interface and lets you open each one and read what is inside. Open a **second terminal** (the first one is recording) and start it:
+
+```bash
+wireshark
+```
+
+If the interface list is empty or Wireshark reports a permission error, close it and run `sudo wireshark` instead.
+
+In the list of interfaces double-click **Loopback: lo** — capturing starts. `lo` is the network inside your own machine: the browser, `curl` and `nmap` reach the DVWA container through `localhost`, so all of this lab's traffic passes through `lo`. In the filter bar at the top type `http || tcp.flags.syn==1` and press Enter. That is a **display filter**: it only hides the packets you don't care about (here everything except HTTP and connection openings); Wireshark keeps recording all of them in the background.
 
 ## Background — network traffic in one minute
 
@@ -77,7 +87,12 @@ You play both roles: in Part 1 you read a login that plain HTTP left in the open
 ## Part 1 — Offensive: interception · ~40 min
 
 ### 1.1 Intercept the login
-While capturing, log in to DVWA. Find the login POST and read the credentials in cleartext.
+While Wireshark is capturing, log in to DVWA with `admin` / `password` (if you are already logged in, click **Logout** first). Now find that login in the capture:
+
+1. In the filter bar type `http.request.method == "POST"` and press Enter. A login form is sent to the server as an HTTP **POST** request, so only a few lines remain.
+2. Click the line whose Info column says `POST /login.php`.
+3. In the middle pane (packet details) expand **HTML Form URL Encoded**: the `username` and `password` fields are there with exactly what you typed.
+4. To see the whole request as plain text, right-click the line → **Follow → HTTP Stream**. Red is what the browser sent, blue is the server's reply. Closing the window leaves the filter set to that one connection; clear it to see everything again.
 
 This is the whole problem in a single packet. HTTP places the form fields directly in the request body, so the password is exposed the moment it leaves the browser — there is nothing to decrypt or crack, because it was never protected in the first place.
 
@@ -91,11 +106,15 @@ Send a request carrying your student ID and find it in the capture:
 curl "http://localhost:4280/?student=<ID>"
 ```
 
+To find it, type `http.request.uri contains "student"` in the filter bar and press Enter. The line that remains is your request — its Info column shows `GET /?student=<ID>`.
+
 Putting your ID in the query string gives you a unique token to search the capture for, so you can prove which of the many `lo` packets are yours. It also makes the point that the whole URL travels in cleartext too — not just form bodies, but query strings, headers and cookies.
 
 **In the report:** a screenshot of the intercepted login and of the packet showing your ID — proof you captured your own traffic.
 
 ### 1.3 Scan the target
+**nmap** is a port scanner: it checks which ports on a machine accept connections, which is usually an attacker's first step to see what is exposed. Leave Wireshark capturing and run the scan in the recording terminal:
+
 ```bash
 sudo nmap -sS -p 1-1000 localhost
 ```
@@ -108,7 +127,7 @@ sudo nmap -sS -p 1-1000 localhost
 ## Part 2 — Defensive: detection & protection · ~30 min
 
 ### 2.1 Spot the scan
-Save the capture (`cap.pcapng`) and list the SYNs per source and port, busiest first:
+Stop the capture (the red square **Stop** button in the toolbar) and save it: **File → Save As…**, and as the file name type the full path `/home/kali/Information-System-Security/lab-03-network/cap.pcapng` (if your Kali user isn't `kali`, use your own user name). `tshark` is Wireshark for the terminal: it reads the same file and prints the fields you ask for, so you can count them with ordinary shell tools. In the recording terminal, list the SYNs per source and port, busiest first:
 
 ```bash
 tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e ip.src -e tcp.dstport | sort | uniq -c | sort -rn | head
