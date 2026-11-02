@@ -22,16 +22,38 @@
 ## Preduvjeti
 
 - [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali + Docker rade.
+- [ ] [Vježba 03](../lab-03-network/README.hr.md) odrađena — repozitorij je kloniran u `~/Information-System-Security`.
 - [ ] Osnove HTTP-a i HTML-a; pojam "sesija / kolačić".
-- [ ] (Korisno) Burp Suite ili preglednikov DevTools.
+- [ ] Alati za razvojne programere u Firefoxu (**F12**).
 
 ## Priprema · ~10 min
+
+Radiš u istom repozitoriju kao u Vježbi 03. Ažuriraj ga, uđi u mapu ove vježbe i zaustavi metu iz Vježbe 03 — obje koriste port 4280, pa može raditi samo jedna:
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-04-web-injection
+docker compose -f ../lab-03-network/compose.yml down
+```
+
+Pokreni snimanje svog rada (obavezno za predaju). Sve što upišeš u ovaj terminal snima se dok na kraju vježbe ne pritisneš `Ctrl-D`; nakon toga zaustavi metu s `docker compose down`:
+
+```bash
+asciinema rec vjezba.cast
+```
+
+Podigni metu — isti **DVWA** kao u Vježbi 03, web aplikacija namjerno napravljena nesigurnom:
 
 ```bash
 docker compose up -d
 ```
 
-Otvori `http://localhost:4280`, prijavi se (`admin`/`password`), *Create / Reset Database*, pa **DVWA Security → Low**.
+Otvori `http://localhost:4280` u Firefoxu, prijavi se s `admin` / `password`, klikni **Create / Reset Database** pri dnu stranice za postavljanje, pa se ponovno prijavi. U lijevom izborniku otvori **DVWA Security**, odaberi **Low** i klikni **Submit**. Razina sigurnosti određuje koliko se DVWA-in vlastiti kod brani: **Low** nema nikakvu zaštitu, **Medium** dodaje naivan filtar (1.3), a **Impossible** je ispravan popravak (tvoja referenca u Dijelu 2).
+
+Trebat će ti i alati za razvojne programere u pregledniku: **desni klik → Inspect** na bilo kojem dijelu stranice pokaže njegov HTML, koji možeš uređivati uživo.
+
+> [!TIP]
+> **Čest problem.** `port is already allocated` znači da meta iz Vježbe 03 još radi: ponovno pokreni redak `docker compose -f ../lab-03-network/compose.yml down`. `no configuration file provided` znači da nisi u mapi `lab-04-web-injection`.
 
 ## Pozadina — injection u minuti
 
@@ -89,11 +111,13 @@ Medium ne popravlja bug — filtrira unos, ovdje izbaci ključnu riječ, ondje e
 ## Dio 2 — Defenzivno: popravi kod · ~30 min
 
 ### 2.1 Pronađi uzrok
-U DVWA-u klikni **View Source** za oba modula. Pokaži točan redak gdje se unos **spaja u SQL upit** i gdje se **ispisuje bez kodiranja** u HTML.
+Dolje desno u svakom modulu klikni **View Source**, pa **Compare All Levels**. U kodu razine **Low** pokaži točan redak gdje se unos **spaja u SQL upit** (SQL Injection: redak koji gradi `$query`) i gdje se **ispisuje bez kodiranja** u HTML (XSS (Reflected): redak koji `$_GET[ 'name' ]` dodaje na stranicu).
 
 ### 2.2 Popravi
 
 Oba popravka su isti potez — vrati granicu između koda i podataka koju je spajanje izbrisalo. **Parametrizirani upit** šalje SQL i vrijednosti odvojenim kanalima, pa baza tvoj unos tretira kao vrijednost, a nikad kao sintaksu, bez obzira na znakove u njemu. **Izlazno kodiranje** escapea opasne znakove (`<`, `>`, `&`, navodnike) za kontekst u koji padaju, pa ih preglednik prikaže umjesto da po njima postupi; **Content-Security-Policy** je zaštitna mreža koja odbija pokrenuti ubačeni inline script i ako jedan promakne.
+
+Razina **Impossible** u *Compare All Levels* je DVWA-ina vlastita ispravna verzija — koristi je kao referencu: `prepare(…)` + `bindParam(…)` za SQL, `htmlspecialchars(…)` za HTML. Svojim riječima objasni što svaki od njih mijenja.
 
 **U izvještaj:**
 - **SQL:** ispravljeni upit kao **parametrizirani / prepared statement** (isječak).
@@ -109,7 +133,7 @@ Oba popravka su isti potez — vrati granicu između koda i podataka koju je spa
 ## Predaja
 
 - `vjezba04_<MB>.pdf` — payloadi, izvučeni podaci, screenshot XSS-a s matičnim brojem, ispravljeni isječci koda, osvrt.
-- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; matični broj na screenshotu XSS-a samo pokazuje čiji je rad, ova snimka je dokaz da je odrađen.
 
 ## Bodovanje
 

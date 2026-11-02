@@ -22,16 +22,38 @@
 ## Prerequisites
 
 - [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
+- [ ] [Lab 03](../lab-03-network/README.md) completed — the repository is cloned to `~/Information-System-Security`.
 - [ ] HTTP and HTML basics; the idea of "session / cookie".
-- [ ] (Useful) Burp Suite or the browser's DevTools.
+- [ ] Firefox developer tools (**F12**).
 
 ## Setup · ~10 min
+
+You work in the same repository as in Lab 03. Update it, go into this lab's folder and stop the Lab 03 target — both labs use port 4280, so only one can run at a time:
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-04-web-injection
+docker compose -f ../lab-03-network/compose.yml down
+```
+
+Start recording your work (required for the submission). Everything you type in this terminal is recorded until you press `Ctrl-D` at the end of the lab; after that, stop the target with `docker compose down`:
+
+```bash
+asciinema rec lab.cast
+```
+
+Bring up the target — the same **DVWA** as in Lab 03, a web app that is insecure on purpose:
 
 ```bash
 docker compose up -d
 ```
 
-Open `http://localhost:4280`, log in (`admin`/`password`), *Create / Reset Database*, then **DVWA Security → Low**.
+Open `http://localhost:4280` in Firefox, log in with `admin` / `password`, click **Create / Reset Database** at the bottom of the setup page, then log in again. In the left menu open **DVWA Security**, choose **Low** and click **Submit**. The security level decides how well DVWA's own code defends itself: **Low** has no protection at all, **Medium** adds a naive filter (1.3), and **Impossible** is the correct fix (your reference in Part 2).
+
+You'll also need the browser's developer tools: **right-click → Inspect** on any part of a page shows its HTML, and you can edit it live.
+
+> [!TIP]
+> **Common pitfall.** `port is already allocated` means the Lab 03 target is still running: run the `docker compose -f ../lab-03-network/compose.yml down` line again. `no configuration file provided` means you are not in `lab-04-web-injection`.
 
 ## Background — injection in one minute
 
@@ -89,11 +111,13 @@ Medium doesn't fix the bug — it filters the input, stripping a keyword here an
 ## Part 2 — Defensive: fix the code · ~30 min
 
 ### 2.1 Find the root cause
-In DVWA click **View Source** for both modules. Point to the exact line where input is **concatenated into the SQL query** and where it is **printed without encoding** into HTML.
+At the bottom right of each module click **View Source**, then **Compare All Levels**. In the **Low** code, point to the exact line where input is **concatenated into the SQL query** (SQL Injection: the line that builds `$query`) and where it is **printed without encoding** into HTML (XSS (Reflected): the line that adds `$_GET[ 'name' ]` to the page).
 
 ### 2.2 Fix it
 
 Both fixes are the same move — put back the boundary between code and data that concatenation erased. A **parameterized query** ships the SQL and the values on separate channels, so the database treats your input as a value and never as syntax, whatever characters it holds. **Output encoding** escapes the dangerous characters (`<`, `>`, `&`, quotes) for the context they land in, so the browser shows them instead of acting on them; a **Content-Security-Policy** is the backstop that refuses to run injected inline script even if one slips through.
+
+The **Impossible** level in *Compare All Levels* is DVWA's own correct version — use it as your reference: `prepare(…)` + `bindParam(…)` for SQL, `htmlspecialchars(…)` for HTML. Explain in your own words what each one changes.
 
 **In the report:**
 - **SQL:** the fixed query as a **parameterized / prepared statement** (snippet).
@@ -109,7 +133,7 @@ Both fixes are the same move — put back the boundary between code and data tha
 ## Submission
 
 - `lab04_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, write-up.
-- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; your ID in the XSS screenshot only shows whose work it is, this recording is the proof of work.
 
 ## Grading
 
