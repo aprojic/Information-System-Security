@@ -27,11 +27,28 @@
 
 ## Priprema · ~10 min
 
+Preuzmi datoteke vježbe u Kali. Repozitorij kloniraš samo jednom: od Vježbe 04 nadalje pokreni `cd ~/Information-System-Security && git pull` i uđi u mapu nove vježbe.
+
+```bash
+sudo apt update && sudo apt install -y git asciinema
+git clone https://github.com/aprojic/Information-System-Security.git ~/Information-System-Security
+cd ~/Information-System-Security/lab-03-network
+```
+
+Pokreni snimanje svog rada (obavezno za predaju). Sve što upišeš u ovaj terminal snima se dok na kraju vježbe ne pritisneš `Ctrl-D`, pa radi u njemu:
+
+```bash
+asciinema rec vjezba.cast
+```
+
 Podigni metu i otvori je (`http://localhost:4280`, prijava `admin` / `password`, pa *Create / Reset Database*):
 
 ```bash
 docker compose up -d
 ```
+
+> [!TIP]
+> **Čest problem.** `no configuration file provided: not found` znači da nisi u mapi vježbe: `cd ~/Information-System-Security/lab-03-network` pa pokušaj ponovno.
 
 Pokreni Wireshark, snimaj na sučelju **`lo`**, filtar prikaza: `http || tcp.flags.syn==1`.
 
@@ -91,16 +108,22 @@ sudo nmap -sS -p 1-1000 localhost
 ## Dio 2 — Defenzivno: detekcija i zaštita · ~30 min
 
 ### 2.1 Prepoznaj skeniranje
-Spremi snimku (`cap.pcapng`) i prebroji SYN pakete po izvoru i portu:
+Spremi snimku (`cap.pcapng`) i ispiši SYN pakete po izvoru i portu, najčešće prvo:
 
 ```bash
 tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e ip.src -e tcp.dstport | sort | uniq -c | sort -rn | head
 ```
 
-Filtar zadržava samo pakete sa SYN zastavicom i bez ACK-a — prvi paket svake veze — pa ih prebroji po izvoru i odredišnom portu. Normalan klijent otvori šačicu veza; skener se istakne kao jedan izvor koji dira stotine portova, i zato ga sortiranje po broju odmah izbaci na vrh.
+Zatim prebroji na koliko je različitih portova stigao SYN:
+
+```bash
+tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e tcp.dstport | sort -u | wc -l
+```
+
+Filtar zadržava samo pakete sa SYN zastavicom i bez ACK-a — prvi paket svake veze. Na vrhu prvog popisa je tvoj vlastiti promet: nekoliko veza prema portu 4280 (redak s praznim izvorom je isti promet preko IPv6, `::1`). Ispod se proteže dugačak rep portova koji su dobili po jedan SYN, a druga naredba mjeri taj rep. Na `lo` sve dolazi s istog računala, pa adresa ne razlikuje skener od preglednika; broj portova razlikuje — normalan klijent razgovara sa šačicom portova, skener sa stotinama.
 
 > [!NOTE]
-> **Očekivano.** Jedan izvor šalje SYN na stotine portova u kratkom vremenu, bez dovršenih rukovanja — potpis SYN skeniranja.
+> **Očekivano.** Druga naredba ispiše oko 1000: jedan izvor poslao je SYN na stotine portova u kratkom vremenu, bez dovršenih rukovanja — potpis SYN skeniranja.
 
 ### 2.2 Zašto obrana radi
 Kratko (3–5 rečenica): zašto bi **TLS** učinio prijavu iz 1.1 nečitljivom, i kako bi **IDS/vatrozid** primijetio skeniranje.
@@ -116,7 +139,7 @@ Kratko (3–5 rečenica): zašto bi **TLS** učinio prijavu iz 1.1 nečitljivom,
 
 - `vjezba03_<MB>.pdf` — screenshotovi presretanja i paketa s matičnim brojem, izlaz `tshark` brojanja, obrambeni osvrt.
 - Snimka `cap.pcapng` (ili isječak).
-- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; matični broj u prometu samo pokazuje čiji je rad, ova snimka je dokaz da je odrađen.
 
 ## Bodovanje
 
