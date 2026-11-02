@@ -41,16 +41,26 @@ Pokreni snimanje svog rada (obavezno za predaju). Sve što upišeš u ovaj termi
 asciinema rec vjezba.cast
 ```
 
-Podigni metu i otvori je (`http://localhost:4280`, prijava `admin` / `password`, pa *Create / Reset Database*):
+Meta je **DVWA** (*Damn Vulnerable Web Application*), web aplikacija namjerno napravljena nesigurnom da na njoj možeš legalno vježbati napade. Ovdje glumi Flickerovu internu aplikaciju: stranicu za prijavu posluženu preko običnog HTTP-a. Radi u Docker kontejneru opisanom u `compose.yml` u ovoj mapi. Pokreni je:
 
 ```bash
 docker compose up -d
 ```
 
+Otvori `http://localhost:4280` u Firefoxu. Pri prvom pokretanju DVWA mora napraviti svoju bazu: prijavi se s `admin` / `password`, pa na stranici za postavljanje klikni **Create / Reset Database** pri dnu. Kad javi uspjeh, idi na `http://localhost:4280/login.php` i ostavi stranicu za prijavu otvorenom — ponovno ćeš se prijaviti u 1.1, ovaj put dok Wireshark snima.
+
 > [!TIP]
 > **Čest problem.** `no configuration file provided: not found` znači da nisi u mapi vježbe: `cd ~/Information-System-Security/lab-03-network` pa pokušaj ponovno.
 
-Pokreni Wireshark, snimaj na sučelju **`lo`**, filtar prikaza: `http || tcp.flags.syn==1`.
+**Wireshark** snima svaki paket koji prođe kroz mrežno sučelje i omogućuje ti da svaki otvoriš i pročitaš što je unutra. Otvori **drugi terminal** (prvi snima) i pokreni ga:
+
+```bash
+wireshark
+```
+
+Ako je popis sučelja prazan ili Wireshark javi grešku s dozvolama, zatvori ga i pokreni `sudo wireshark`.
+
+U popisu sučelja dvaput klikni **Loopback: lo** — snimanje kreće. `lo` je mreža unutar tvog računala: preglednik, `curl` i `nmap` do DVWA kontejnera dolaze preko `localhost`, pa sav promet ove vježbe prolazi kroz `lo`. U traku za filtar na vrhu upiši `http || tcp.flags.syn==1` i pritisni Enter. To je **filtar prikaza**: samo skriva pakete koji te ne zanimaju (ovdje sve osim HTTP-a i otvaranja veza); Wireshark ih u pozadini i dalje sve snima.
 
 ## Pozadina — mrežni promet u minuti
 
@@ -77,7 +87,12 @@ Igraš obje uloge: u Dijelu 1 pročitaš prijavu koju je obični HTTP ostavio na
 ## Dio 1 — Ofenzivno: presretanje · ~40 min
 
 ### 1.1 Presretni prijavu
-Dok snimaš, prijavi se u DVWA. Nađi POST prijave i pročitaj prijavne podatke u čistom tekstu.
+Dok Wireshark snima, prijavi se u DVWA s `admin` / `password` (ako si već prijavljen, prvo klikni **Logout**). Sad pronađi tu prijavu u snimci:
+
+1. U traku za filtar upiši `http.request.method == "POST"` i pritisni Enter. Obrazac za prijavu šalje se poslužitelju kao HTTP **POST** zahtjev, pa ostane tek nekoliko redaka.
+2. Klikni redak u kojem stupac Info glasi `POST /login.php`.
+3. U srednjem oknu (detalji paketa) rasklopi **HTML Form URL Encoded**: tamo su polja `username` i `password` s točno onim što si upisao.
+4. Za cijeli zahtjev kao običan tekst: desni klik na redak → **Follow → HTTP Stream**. Crveno je ono što je poslao preglednik, plavo odgovor poslužitelja. Kad zatvoriš prozor, filtar ostane postavljen na tu jednu vezu; obriši ga da opet vidiš sve.
 
 To je cijeli problem u jednom paketu. HTTP stavlja polja obrasca ravno u tijelo zahtjeva, pa je lozinka izložena čim napusti preglednik — nema se što dešifrirati ni razbijati, jer nikad nije ni bila zaštićena.
 
@@ -91,11 +106,15 @@ Pošalji zahtjev koji nosi tvoj matični broj i pronađi ga u snimci:
 curl "http://localhost:4280/?student=<MB>"
 ```
 
+Da ga pronađeš, u traku za filtar upiši `http.request.uri contains "student"` i pritisni Enter. Redak koji ostane je tvoj zahtjev — stupac Info pokazuje `GET /?student=<MB>`.
+
 Matični broj u query stringu daje ti jedinstveni token za pretragu snimke, pa možeš dokazati koji su od mnogih `lo` paketa baš tvoji. Usput pokazuje i da cijeli URL putuje u čistom tekstu — ne samo tijela obrazaca, nego i query stringovi, zaglavlja i cookieji.
 
 **U izvještaj:** screenshot presretnute prijave i paketa u kojem se vidi tvoj matični broj — dokaz da si snimio vlastiti promet.
 
 ### 1.3 Skeniranje mete
+**nmap** je skener portova: provjerava koji portovi na računalu primaju veze, što je napadaču obično prvi korak da vidi što je izloženo. Ostavi Wireshark da snima, a skeniranje pokreni u terminalu koji snima:
+
 ```bash
 sudo nmap -sS -p 1-1000 localhost
 ```
@@ -108,7 +127,7 @@ sudo nmap -sS -p 1-1000 localhost
 ## Dio 2 — Defenzivno: detekcija i zaštita · ~30 min
 
 ### 2.1 Prepoznaj skeniranje
-Spremi snimku (`cap.pcapng`) i ispiši SYN pakete po izvoru i portu, najčešće prvo:
+Zaustavi snimanje (crveni kvadrat **Stop** u alatnoj traci) i spremi snimku: **File → Save As…**, a kao naziv datoteke upiši cijelu putanju `/home/kali/Information-System-Security/lab-03-network/cap.pcapng` (ako tvoj korisnik na Kaliju nije `kali`, upiši svoje korisničko ime). `tshark` je Wireshark za terminal: čita istu datoteku i ispisuje polja koja zatražiš, pa ih možeš prebrojiti običnim alatima ljuske. U terminalu koji snima ispiši SYN pakete po izvoru i portu, najčešće prvo:
 
 ```bash
 tshark -r cap.pcapng -Y 'tcp.flags.syn==1 && tcp.flags.ack==0' -T fields -e ip.src -e tcp.dstport | sort | uniq -c | sort -rn | head
