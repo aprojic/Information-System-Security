@@ -16,7 +16,7 @@
 
 - Izvesti SQL injection i izvući podatke iz baze.
 - Izvesti reflektirani i pohranjeni XSS te oteti kolačić sesije.
-- U ranjivom kodu prepoznati uzrok (spajanje unosa u upit / neizlazno ispisivanje).
+- U ranjivom kodu prepoznati uzrok (spajanje unosa u upit / ispis bez kodiranja).
 - Popraviti ranjivost parametriziranim upitom i izlaznim kodiranjem.
 
 ## Preduvjeti
@@ -59,7 +59,7 @@ Trebat će ti i alati za razvojne programere u pregledniku: **desni klik → Ins
 
 Web aplikacija neprestano sastavlja rečenice koje će neki drugi stroj protumačiti — SQL query za bazu, HTML stranicu za preglednik — tako što tvoj unos zalijepi u predložak. Injection se događa kad se taj unos umiješa ravno u rečenicu: jedan navodnik zatvori string literal u queryju, pa se sve iza čita kao *SQL* umjesto kao podatak, a `<script>` tag se čita kao *markup*, pa ga preglednik pokrene kao kod. Program tada radi ono što kažu napadačevi znakovi, a ne ono što je programer mislio. **SQL injection** cilja na bazu — uvjet koji je uvijek istinit ili `UNION SELECT` pretvore jedno dohvaćanje u dump svih korisnika i hasheva lozinki. **XSS** cilja na tuđe preglednike — pohranjeni komentar ili reflektirani parametar nosi script koji se izvrši u sesiji sljedećeg posjetitelja i može mu ukrasti cookie. Isti korijenski uzrok, samo se otima druga vrsta rečenice.
 
-Rješenje je oba puta ista ideja: drži **podatke** i **kod** odvojeno da unos nikad ne može prijeći granicu ni u jedno ni u drugo. Za SQL to znači **parametrizirane (prepared) upite** — struktura upita je fiksirana unaprijed, a tvoj unos ide zasebno kao vrijednost, pa je navodnik samo navodnik. Za HTML to znači **izlazno kodiranje / escaping po kontekstu** — `<` postane `&lt;` u trenutku ispisa, pa se script tag prikaže kao vidljiv tekst umjesto da se izvrši. Nije riječ o rubnom bugu: injection godinama stoji na vrhu ili pri vrhu OWASP Top 10 liste, toliko središnji da je cross-site scripting danas uvršten u istu kategoriju. I skalira se — Samy worm bio je pohranjeni XSS koji se proširio na preko milijun MySpace profila za manje od dana, a svaki zaraženi profil ponovno je posluživao script svakome tko ga pogleda.
+Rješenje je oba puta ista ideja: drži **podatke** i **kod** odvojeno da unos nikad ne može prijeći granicu ni u jedno ni u drugo. Za SQL to znači **parametrizirane (prepared) upite** — struktura upita je fiksirana unaprijed, a tvoj unos ide zasebno kao vrijednost, pa je navodnik samo navodnik. Za HTML to znači **izlazno kodiranje / escaping po kontekstu** — `<` postane `&lt;` u trenutku ispisa, pa se script tag prikaže kao vidljiv tekst umjesto da se izvrši. Nije riječ o rubnom bugu: injection je godinama bio na vrhu OWASP Top 10 liste i još je na njoj, a cross-site scripting danas se broji u istu kategoriju. I skalira se — Samy worm bio je pohranjeni XSS koji se proširio na preko milijun MySpace profila za manje od dana, a svaki zaraženi profil ponovno je posluživao script svakome tko ga pogleda.
 
 ```mermaid
 flowchart LR
@@ -133,7 +133,7 @@ hashcat -m 0 hash.txt --show
 
 Sada dokaži **pohranjeni XSS**, kod kojeg DVWA sprema payload u knjigu gostiju i izvršava ga kad god netko otvori tu stranicu.
 
-2. Otvori drugi terminal i pokreni **netcat** (`nc`) kao slušatelj (`listener`) na TCP portu 8000. Ostavi ga da radi:
+2. U terminalu koji snimaš pokreni **netcat** (`nc`) kao slušatelj (`listener`) na TCP portu 8000 i ostavi ga da radi. Tako ukradeni cookie stigne u tvoju snimku:
 
 ```bash
 nc -lvnp 8000
@@ -197,7 +197,7 @@ Medium nije uklonio ranjivost, nego je samo stavio nekoliko stringova na blackli
 
 **U izvještaj:** screenshotovi rezultata Medium SQLi-ja i Medium reflektiranog XSS-a (te pohranjenog XSS-a ako si radio bonus) i 3–5 rečenica o tome što je svaki filtar pokušao blokirati i zašto je bypass uspio.
 
-## Dio 2 — Defenzivno: popravi kod · ~30 min
+## Dio 2 — Defenzivno: popravi kod · ~35 min
 
 ### 2.1 Pronađi uzrok
 Dolje desno u svakom modulu klikni **View Source**, pa **Compare All Levels**. U kodu razine **Low** pokaži točan redak gdje se unos **spaja u SQL upit** (SQL Injection: redak koji gradi `$query`) i gdje se **ispisuje bez kodiranja** u HTML (XSS (Reflected): redak koji `$_GET[ 'name' ]` dodaje na stranicu).
@@ -212,7 +212,18 @@ Razina **Impossible** u *Compare All Levels* je DVWA-ina vlastita ispravna verzi
 - **SQL:** ispravljeni upit kao **parametrizirani / prepared statement** (isječak).
 - **XSS:** izlazno kodiranje/escaping unosa (spomeni ulaznu validaciju i `Content-Security-Policy`).
 
-### 2.3 Preporuke
+### 2.3 Dokaži popravak
+Na razini **Impossible** radi ispravljeni kod, zato ga napadni. Otvori **DVWA Security**, odaberi **Impossible**, klikni **Submit**, pa ponovi svoje napade s razine Low:
+
+1. **SQL Injection:** pošalji `1`, a zatim oba payloada iz 1.1.
+2. **XSS (Reflected):** pošalji payload iz 1.2.
+
+> [!NOTE]
+> **Očekivano.** `1` i dalje vraća jednog korisnika, ali oba SQL payloada ne vraćaju ništa: ispravljeni kod prihvaća samo broj i predaje ga upitu kao vezanu vrijednost, pa tvoj navodnik nikad ne postane SQL. XSS payload pojavi se na stranici kao običan tekst, `Hello <script>alert(document.cookie)</script>`, i nikakav se alert ne otvori.
+
+**U izvještaj:** screenshotovi oba rezultata na razini Impossible i po jedna rečenica o tome zašto je isti unos sada bezopasan.
+
+### 2.4 Preporuke
 3 konkretne preporuke za siguran razvoj (parametrizirani upiti svugdje, kodiranje po kontekstu izlaza, CSP, najmanje ovlasti za DB korisnika).
 
 ### Za brze — bonus
@@ -222,7 +233,7 @@ Razina **Impossible** u *Compare All Levels* je DVWA-ina vlastita ispravna verzi
 
 ## Predaja
 
-- `vjezba04_<MB>.pdf` — payloadi, izvučeni podaci, screenshot XSS-a s matičnim brojem, ispravljeni isječci koda, osvrt.
+- `vjezba04_<MB>.pdf` — payloadi, izvučeni podaci, screenshot XSS-a s matičnim brojem, ispravljeni isječci koda, rezultati na razini Impossible, osvrt.
 - **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; matični broj na screenshotu XSS-a samo pokazuje čiji je rad, ova snimka je dokaz da je odrađen.
 
 ## Bodovanje
