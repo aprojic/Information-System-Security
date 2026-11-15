@@ -5,7 +5,7 @@
 
 *You're logged in as you — but can you see other people's data? Attacks on access control and tokens often need no exploit, just curiosity.*
 
-`~90 min` · `Kali · Juice Shop · DevTools/Burp` · `level: intermediate` · `submit: Merlin`
+`~90 min` · `Kali · Juice Shop · Firefox DevTools` · `level: intermediate` · `submit: Merlin`
 
 > [!WARNING]
 > **Ethics & scope.** Only against the Juice Shop target in the lab environment.
@@ -16,22 +16,43 @@
 
 - Find hidden functionality and understand how a SPA talks to its API.
 - Exploit broken access control (IDOR) to reach other users' data.
-- Analyse and modify a JWT session token.
+- Read and analyse a JWT session token.
 - Explain correct authorization and token verification on the server.
 
 ## Prerequisites
 
 - [ ] [Lab 00](../lab-00-setup/README.md) completed — Kali + Docker working.
-- [ ] Browser DevTools (Network and Application tabs) or Burp Suite.
+- [ ] The course repository cloned into `~/Information-System-Security` (you did this in [Lab 03](../lab-03-network/README.md)).
 - [ ] Concepts: session, token, Base64, JSON.
 
 ## Setup · ~10 min
+
+You work in the same repository as in Lab 04. Update it, go into this lab's folder and stop the Lab 04 target — you no longer need it, and stopping it frees memory in the VM:
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-05-web-auth
+docker compose -f ../lab-04-web-injection/compose.yml down
+```
+
+Start recording your work (required for the submission). Everything you type in this terminal is recorded until you press `Ctrl-D` at the end of the lab; after that, stop the target with `docker compose down`:
+
+```bash
+asciinema rec lab.cast
+```
+
+Bring up the target, **OWASP Juice Shop** — a deliberately insecure online shop built for security training. Like most modern web apps it is a single-page app: the browser downloads one JavaScript application, which then talks to the server's REST API (`/api/...`, `/rest/...`). It has over a hundred built-in challenges; it records every one you solve on a hidden *Score Board* page and announces it with a green banner.
 
 ```bash
 docker compose up -d
 ```
 
-Open `http://localhost:3000`. **Register an account with an email containing your student ID** (e.g. `<ID>@flicker.test`) — so everything you do is tied to you.
+Wait about 10 seconds, then open `http://localhost:3000` in Firefox. Close the welcome window (**Dismiss**) and the cookie notice (**Me want it!**). Register an account tied to you: **Account → Login → Not yet a customer?**, use the email `<ID>@flicker.test` (your student ID), any password and security question, click **Register**, then **Log in** with the same email.
+
+You'll work in the browser's developer tools: press **F12**. You need three tabs: **Debugger** (the JavaScript files the page loaded), **Network** (every request the page sends to the server) and **Storage** (what the site keeps in your browser: Local Storage, Session Storage, Cookies).
+
+> [!TIP]
+> **Common pitfall.** `no configuration file provided` means you are not in `lab-05-web-auth`. If the page doesn't load, Juice Shop is still starting: wait a few seconds and reload.
 
 ## Background — access control in one minute
 
@@ -59,27 +80,51 @@ The left side is the whole attack in Part 1; the right side is the single server
 ## Part 1 — Offensive: access & tokens · ~45 min
 
 ### 1.1 Find the hidden function
-Find the hidden *Score Board* page (Juice Shop tracks solved challenges). Explain how you found it (inspecting the client-side code / routes).
+Find the hidden *Score Board* page — the menu doesn't link to it.
+
+1. In DevTools open **Debugger** and, under `localhost:3000`, click `main.js`. It is minified into a few very long lines; click **{ }** (Pretty print) at the bottom of the source to make it readable.
+2. Press `Ctrl+F` in the source and search for `score`. Among the routes you'll find `/score-board`.
+3. Open `http://localhost:3000/#/score-board`.
 
 A single-page app ships its entire routing table to the browser, so every page — including ones the menu never links to — is sitting in the JavaScript you already downloaded. "Hidden" here means *unlisted*, not *protected*: reading the client code reveals the route, and nothing on the server stops you from visiting it.
 
+> [!NOTE]
+> **Expected.** A green banner *You successfully solved a challenge: Score Board*, and a page listing all challenges with your progress.
+
 ### 1.2 Broken access control (IDOR)
-Logged in as your user, use the API to reach data that isn't yours (e.g. another user's basket) by changing an identifier in the request.
+Logged in as your user, reach another user's shopping basket by changing one identifier.
+
+1. Open DevTools **Network**, then click **Your Basket** (top right). Among the requests find `GET /rest/basket/<n>` — `<n>` is the id of *your* basket (a small number, e.g. `6`). Click the request and look at the **Response**: your own basket.
+2. Open **Storage → Session Storage → `http://localhost:3000`**. The key `bid` holds the same number: this is where the app keeps your basket id and reads it back on every basket request.
+3. Double-click the value of `bid`, change it to `1`, press Enter, then reload the page (**F5**).
 
 The id in the request is the only thing that selects the resource, and it comes from you — the client. That is the whole vulnerability: the server authenticated you but authorized nothing, so changing the id walks you straight into another account's data. Logging in proved *who* you are; it never asked *whether you may have this specific record*.
 
 > [!NOTE]
-> **Expected.** The server returns someone else's data because it only checks that you're logged in, not that the resource is yours.
+> **Expected.** The heading still reads *Your Basket (`<ID>@flicker.test`)*, but the products are someone else's (for basket `1`: Apple Juice, Orange Juice, Eggfruit Juice), a green banner announces *View Basket*, and **Network** shows `GET /rest/basket/1` answered with `200`. The server returned someone else's data because it only checked that you're logged in, not that the basket is yours.
 
 ### 1.3 The JWT session token
-In DevTools (Application → Storage) find the JWT. Decode its three parts (Base64) and show the header and `payload`. Explain the `alg` field and why the signature is critical.
+Read the session token Juice Shop gave you at login.
+
+1. Open **Storage → Local Storage → `http://localhost:3000`** and click the key `token`. The value is your JWT: three Base64 parts separated by dots (`header.payload.signature`). Double-click the value, then copy it with `Ctrl+A`, `Ctrl+C`.
+2. In the terminal, store it and decode the first two parts (paste your token between the quotes):
+
+```bash
+TOKEN='<paste the token here>'
+python3 -c 'import sys,base64,json; t=sys.argv[1].split("."); [print(json.dumps(json.loads(base64.urlsafe_b64decode(p+"="*(-len(p)%4))),indent=2)) for p in t[:2]]' "$TOKEN"
+```
+
+> [!NOTE]
+> **Expected.** The header is `{"typ": "JWT", "alg": "RS256"}`. The payload holds `data` (your `id`, `email`, `role` …), `bid` (your basket id) and `iat` (when it was issued). Look closely at `data.password`: it is your password as an unsalted **MD5** hash — the kind you cracked in Lab 01 — and anyone who sees the token can read it. Notice too that there is no `exp` (expiry) claim.
+
+Explain the `alg` field and why the signature is critical. `RS256` means the server signs the token with its private key and verifies it with the matching public key, so nobody without that private key can produce a valid signature.
 
 Reading the token is trivial, but that is not the attack. The real risk is in *how* the server verifies it: the `alg` header announces which algorithm to check the signature with, so a server that trusts that field blindly can be handed a token claiming `alg: none` — no signature at all — and wave it through. That is why a correct verifier pins its own algorithm instead of taking the attacker's word for it.
 
 > [!TIP]
 > **Common pitfall.** A JWT is not encrypted — Base64 is not a secret. Anyone can *read* a token; the security is in the **signature**. Don't try to break cryptography; show you understand the structure and the risk of a weak/omitted signature.
 
-**In the report:** how you found the Score Board, proof of IDOR (request + other user's data), the decoded JWT with field explanations, and a Score Board screenshot showing your ID account.
+**In the report:** how you found the Score Board, proof of IDOR (the `GET /rest/basket/1` request and a screenshot of the other user's basket under your `<ID>@flicker.test` heading), the decoded JWT with field explanations, and a Score Board screenshot.
 
 ## Part 2 — Defensive: correct authorization · ~30 min
 
@@ -89,10 +134,10 @@ Explain (3–5 sentences) why IDOR works (authorization relies on a client-suppl
 ### 2.2 The fix
 **In the report:**
 - **Access:** a server-side resource-ownership check (e.g. `resource.owner == current_user`); never trust the ID from the request.
-- **Token:** the correct JWT checks (signature, `alg` allowlist, expiry, issuer) and why the secret must be strong.
+- **Token:** the correct JWT checks (signature, `alg` allowlist, expiry, issuer) and why the signing key must stay secret and strong (a long random secret for HS256, a private key for RS256 as here).
 
 ### 2.3 Recommendations
-3 concrete recommendations (authorize on every request, "deny by default", short token lifetime + rotation, never put sensitive data in the token).
+3 concrete recommendations (authorize on every request, "deny by default", short token lifetime + rotation, never put sensitive data in the token). Use what you found in 1.3: the token carries a password hash and has no `exp`.
 
 ### Bonus
 - Solve one more Score Board challenge and describe the vulnerability.
@@ -100,8 +145,8 @@ Explain (3–5 sentences) why IDOR works (authorization relies on a client-suppl
 
 ## Submission
 
-- `lab05_<ID>.pdf` — findings, decoded JWT, Score Board screenshot with your ID account, defensive write-up.
-- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; the flag only identifies you, this recording is the proof of work.
+- `lab05_<ID>.pdf` — findings, IDOR screenshot with your ID, decoded JWT, Score Board screenshot, defensive write-up.
+- An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; your ID in the IDOR screenshot only shows whose work it is, this recording is the proof of work.
 
 ## Grading
 
