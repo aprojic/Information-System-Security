@@ -5,7 +5,7 @@
 
 *Prijavljen si kao ti — ali vidiš li tuđe podatke? Napadi na kontrolu pristupa i tokene često ne traže nijedan exploit, samo znatiželju.*
 
-`~90 min` · `Kali · Juice Shop · DevTools/Burp` · `razina: srednja` · `predaja: Merlin`
+`~90 min` · `Kali · Juice Shop · Firefox DevTools` · `razina: srednja` · `predaja: Merlin`
 
 > [!WARNING]
 > **Etika i opseg.** Isključivo na Juice Shop meti u lab okruženju.
@@ -16,22 +16,43 @@
 
 - Pronaći skrivene funkcije i razumjeti kako SPA razgovara s API-jem.
 - Iskoristiti neispravnu kontrolu pristupa (IDOR) za tuđe podatke.
-- Analizirati i izmijeniti JWT token sesije.
+- Pročitati i analizirati JWT token sesije.
 - Objasniti ispravnu autorizaciju i provjeru tokena na poslužitelju.
 
 ## Preduvjeti
 
 - [ ] [Vježba 00](../lab-00-setup/README.hr.md) odrađena — Kali + Docker rade.
-- [ ] Preglednikov DevTools (Network i Application) ili Burp Suite.
+- [ ] Repozitorij kolegija kloniran u `~/Information-System-Security` (to si napravio u [Vježbi 03](../lab-03-network/README.hr.md)).
 - [ ] Pojmovi: sesija, token, Base64, JSON.
 
 ## Priprema · ~10 min
+
+Radiš u istom repozitoriju kao u Vježbi 04. Ažuriraj ga, uđi u mapu ove vježbe i zaustavi metu iz Vježbe 04 — više ti ne treba, a gašenjem oslobađaš memoriju u VM-u:
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-05-web-auth
+docker compose -f ../lab-04-web-injection/compose.yml down
+```
+
+Pokreni snimanje svog rada (obavezno za predaju). Sve što upišeš u ovaj terminal snima se dok na kraju vježbe ne pritisneš `Ctrl-D`; nakon toga zaustavi metu s `docker compose down`:
+
+```bash
+asciinema rec vjezba.cast
+```
+
+Podigni metu, **OWASP Juice Shop** — web trgovinu namjerno napravljenu nesigurnom za vježbanje sigurnosti. Kao većina modernih web aplikacija, to je single-page aplikacija: preglednik skine jednu JavaScript aplikaciju, koja zatim razgovara s REST API-jem poslužitelja (`/api/...`, `/rest/...`). Ima više od stotinu ugrađenih izazova; svaki koji riješiš bilježi na skrivenoj stranici *Score Board* i najavi zelenom porukom.
 
 ```bash
 docker compose up -d
 ```
 
-Otvori `http://localhost:3000`. **Registriraj račun s e-mailom koji sadrži tvoj matični broj** (npr. `<MB>@flicker.test`) — tako je sve povezano s tobom.
+Pričekaj desetak sekundi, pa otvori `http://localhost:3000` u Firefoxu. Zatvori prozor dobrodošlice (**Dismiss**) i obavijest o kolačićima (**Me want it!**). Registriraj račun vezan uz sebe: **Account → Login → Not yet a customer?**, kao e-mail upiši `<MB>@flicker.test` (tvoj matični broj), bilo koju lozinku i sigurnosno pitanje, klikni **Register**, pa se prijavi (**Log in**) istim e-mailom.
+
+Radit ćeš u alatima za razvojne programere u pregledniku: pritisni **F12**. Trebaju ti tri kartice: **Debugger** (JavaScript datoteke koje je stranica učitala), **Network** (svaki zahtjev koji stranica šalje poslužitelju) i **Storage** (što stranica drži u tvom pregledniku: Local Storage, Session Storage, Cookies).
+
+> [!TIP]
+> **Čest problem.** `no configuration file provided` znači da nisi u mapi `lab-05-web-auth`. Ako se stranica ne učita, Juice Shop se još pokreće: pričekaj nekoliko sekundi i osvježi.
 
 ## Pozadina — kontrola pristupa u minuti
 
@@ -59,27 +80,51 @@ Lijeva strana je cijeli napad iz Dijela 1; desna je ta jedna provjera na posluž
 ## Dio 1 — Ofenzivno: pristup i tokeni · ~45 min
 
 ### 1.1 Pronađi skrivenu funkciju
-Pronađi skrivenu *Score Board* stranicu (Juice Shop prati riješene izazove). Objasni kako si je našao (pregled klijentskog koda / rute).
+Pronađi skrivenu stranicu *Score Board* — izbornik ne vodi na nju.
+
+1. U DevToolsu otvori **Debugger** i pod `localhost:3000` klikni `main.js`. Minificiran je u nekoliko vrlo dugih redaka; klikni **{ }** (Pretty print) pri dnu koda da postane čitljiv.
+2. Pritisni `Ctrl+F` u kodu i potraži `score`. Među rutama naći ćeš `/score-board`.
+3. Otvori `http://localhost:3000/#/score-board`.
 
 Single-page aplikacija šalje cijelu tablicu ruta u preglednik, pa svaka stranica — i one koje izbornik nigdje ne vodi — već je u JavaScriptu koji si skinuo. „Skriveno" ovdje znači *neizlistano*, ne *zaštićeno*: pregled klijentskog koda otkrije rutu, a poslužitelj te ničim ne spriječi da je posjetiš.
 
+> [!NOTE]
+> **Očekivano.** Zelena poruka *You successfully solved a challenge: Score Board* i stranica s popisom svih izazova i tvojim napretkom.
+
 ### 1.2 Neispravna kontrola pristupa (IDOR)
-Prijavljen kao svoj korisnik, kroz API dođi do podataka koji nisu tvoji (npr. tuđa košarica) mijenjajući identifikator u zahtjevu.
+Prijavljen kao svoj korisnik, dođi do tuđe košarice promjenom jednog identifikatora.
+
+1. Otvori DevTools **Network**, pa klikni **Your Basket** (gore desno). Među zahtjevima nađi `GET /rest/basket/<n>` — `<n>` je id *tvoje* košarice (mali broj, npr. `6`). Klikni zahtjev i pogledaj **Response**: tvoja vlastita košarica.
+2. Otvori **Storage → Session Storage → `http://localhost:3000`**. Ključ `bid` sadrži isti broj: tu aplikacija drži id tvoje košarice i čita ga pri svakom zahtjevu za košaricu.
+3. Dvoklikni vrijednost ključa `bid`, promijeni je u `1`, pritisni Enter, pa osvježi stranicu (**F5**).
 
 Id u zahtjevu je jedino što bira resurs, a dolazi od tebe — klijenta. To je cijela ranjivost: poslužitelj je potvrdio tko si, ali ništa nije autorizirao, pa te promjena id-a odvede ravno u tuđi račun. Login je dokazao *tko* si; nikad nije pitao *smiješ li baš ovaj zapis*.
 
 > [!NOTE]
-> **Očekivano.** Poslužitelj vraća tuđe podatke jer provjerava samo da si prijavljen, a ne da je resurs tvoj.
+> **Očekivano.** Naslov i dalje glasi *Your Basket (`<MB>@flicker.test`)*, ali proizvodi su tuđi (za košaricu `1`: Apple Juice, Orange Juice, Eggfruit Juice), zelena poruka najavi *View Basket*, a **Network** pokazuje da je `GET /rest/basket/1` odgovoren s `200`. Poslužitelj je vratio tuđe podatke jer je provjerio samo da si prijavljen, a ne da je košarica tvoja.
 
 ### 1.3 JWT token sesije
-U DevToolsu (Application → Storage) nađi JWT. Dekodiraj tri dijela (Base64) i pokaži zaglavlje i `payload`. Objasni polje `alg` i zašto je potpis ključan.
+Pročitaj token sesije koji ti je Juice Shop dao pri prijavi.
+
+1. Otvori **Storage → Local Storage → `http://localhost:3000`** i klikni ključ `token`. Vrijednost je tvoj JWT: tri Base64 dijela odvojena točkama (`zaglavlje.payload.potpis`). Dvoklikni vrijednost, pa je kopiraj s `Ctrl+A`, `Ctrl+C`.
+2. U terminalu ga spremi i dekodiraj prva dva dijela (zalijepi svoj token između navodnika):
+
+```bash
+TOKEN='<ovdje zalijepi token>'
+python3 -c 'import sys,base64,json; t=sys.argv[1].split("."); [print(json.dumps(json.loads(base64.urlsafe_b64decode(p+"="*(-len(p)%4))),indent=2)) for p in t[:2]]' "$TOKEN"
+```
+
+> [!NOTE]
+> **Očekivano.** Zaglavlje je `{"typ": "JWT", "alg": "RS256"}`. Payload sadrži `data` (tvoj `id`, `email`, `role` …), `bid` (id tvoje košarice) i `iat` (kad je izdan). Pogledaj pažljivo `data.password`: to je tvoja lozinka kao nesoljeni **MD5** hash — ista vrsta hasha koju si razbijao u Vježbi 01 — i svatko tko vidi token može je pročitati. Primijeti i da nema polja `exp` (istek).
+
+Objasni polje `alg` i zašto je potpis ključan. `RS256` znači da poslužitelj potpisuje token svojim privatnim ključem i provjerava ga odgovarajućim javnim, pa nitko bez tog privatnog ključa ne može napraviti valjan potpis.
 
 Pročitati token je trivijalno, ali to nije napad. Pravi rizik je u tome *kako* ga poslužitelj provjerava: zaglavlje `alg` najavljuje kojim algoritmom provjeriti potpis, pa poslužitelj koji tom polju slijepo vjeruje može dobiti token koji tvrdi `alg: none` — bez ikakvog potpisa — i propustiti ga. Zato ispravan verifikator fiksira vlastiti algoritam umjesto da vjeruje napadaču na riječ.
 
 > [!TIP]
 > **Čest problem.** JWT nije šifriran — Base64 nije tajna. Svatko ga može *pročitati*; sigurnost je u **potpisu**. Ne pokušavaj probiti kriptografiju; pokaži razumijevanje strukture i rizika slabog/izostavljenog potpisa.
 
-**U izvještaj:** kako si našao Score Board, dokaz IDOR-a (zahtjev + tuđi podaci), dekodirani JWT s objašnjenjem polja, i screenshot Score Boarda s tvojim računom.
+**U izvještaj:** kako si našao Score Board, dokaz IDOR-a (zahtjev `GET /rest/basket/1` i screenshot tuđe košarice pod tvojim naslovom `<MB>@flicker.test`), dekodirani JWT s objašnjenjem polja, i screenshot Score Boarda.
 
 ## Dio 2 — Defenzivno: ispravna autorizacija · ~30 min
 
@@ -89,10 +134,10 @@ Objasni (3–5 rečenica) zašto IDOR radi (autorizacija se oslanja na klijentsk
 ### 2.2 Popravak
 **U izvještaj:**
 - **Pristup:** provjera vlasništva resursa na poslužitelju (npr. `resource.owner == current_user`); ne vjeruj ID-u iz zahtjeva.
-- **Token:** ispravne provjere JWT-a (potpis, `alg` allowlist, istek, izdavatelj) i zašto tajna mora biti jaka.
+- **Token:** ispravne provjere JWT-a (potpis, `alg` allowlist, istek, izdavatelj) i zašto ključ za potpisivanje mora ostati tajan i jak (duga nasumična tajna za HS256, privatni ključ za RS256 kao ovdje).
 
 ### 2.3 Preporuke
-3 konkretne preporuke (autorizacija po svakom zahtjevu, "deny by default", kratki rok tokena + rotacija, nikad osjetljivi podaci u tokenu).
+3 konkretne preporuke (autorizacija po svakom zahtjevu, "deny by default", kratki rok tokena + rotacija, nikad osjetljivi podaci u tokenu). Iskoristi ono što si našao u 1.3: token nosi hash lozinke i nema `exp`.
 
 ### Za brze — bonus
 - Riješi još jedan Score Board izazov i opiši ranjivost.
@@ -100,8 +145,8 @@ Objasni (3–5 rečenica) zašto IDOR radi (autorizacija se oslanja na klijentsk
 
 ## Predaja
 
-- `vjezba05_<MB>.pdf` — nalazi, dekodirani JWT, screenshot Score Boarda s tvojim računom, obrambeni osvrt.
-- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; flag samo pokazuje čiji je rad, snimka je dokaz da je odrađen.
+- `vjezba05_<MB>.pdf` — nalazi, screenshot IDOR-a s matičnim brojem, dekodirani JWT, screenshot Score Boarda, obrambeni osvrt.
+- **[asciinema](https://asciinema.org/) snimka** rada (`asciinema rec vjezba.cast`, zaustavi s `Ctrl-D`) — obavezna; matični broj na screenshotu IDOR-a samo pokazuje čiji je rad, ova snimka je dokaz da je odrađen.
 
 ## Bodovanje
 
