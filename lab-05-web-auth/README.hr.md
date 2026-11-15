@@ -154,6 +154,6 @@ Objasni (3–5 rečenica) zašto IDOR radi (autorizacija se oslanja na klijentsk
 |---|:-:|
 | Skrivena funkcija + razumijevanje API-ja | 2 |
 | IDOR do tuđih podataka | 3 |
-| Analiza JWT tokena | 2 |
+| Analiza JWT tokena | 3 |
 | Obrambeni osvrt (autorizacija + token) i preporuke | 2 |
 | Bonus | +1 |

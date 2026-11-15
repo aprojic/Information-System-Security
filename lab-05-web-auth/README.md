@@ -154,6 +154,6 @@ Explain (3–5 sentences) why IDOR works (authorization relies on a client-suppl
 |---|:-:|
 | Hidden function + API understanding | 2 |
 | IDOR to other users' data | 3 |
-| JWT token analysis | 2 |
+| JWT token analysis | 3 |
 | Defensive write-up (authorization + token) and recommendations | 2 |
 | Bonus | +1 |
