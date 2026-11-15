@@ -59,7 +59,7 @@ You'll also need the browser's developer tools: **right-click → Inspect** on a
 
 A web app is constantly building sentences for some other machine to interpret — an SQL query for the database, an HTML page for the browser — by pasting your input into a template string. Injection happens when that input is mixed straight into the sentence: a single quote closes the query's string literal, so whatever follows is read as *SQL* instead of data, and a `<script>` tag is read as *markup*, so the browser runs it as code. The program then does what the attacker's characters say, not what the developer meant. **SQL injection** aims at the database — an always-true condition or a `UNION SELECT` turns one lookup into a dump of every user and password hash. **XSS** aims at other people's browsers — a stored comment or a reflected parameter carries a script that runs in the next visitor's session and can steal their cookie. Same root cause, two different sentences being hijacked.
 
-The fix is the same idea both times: keep **data** and **code** apart so input can never cross the line into either. For SQL that means **parameterized (prepared) queries** — the query structure is fixed up front and your input is sent separately as a value, so a quote is just a quote. For HTML it means **output encoding / context-aware escaping** — `<` becomes `&lt;` at the moment of printing, so a script tag renders as visible text instead of executing. This is not a fringe bug: injection has sat at or near the top of the OWASP Top 10 for years, so central that cross-site scripting is now folded into the same category. And it scales — the Samy worm was a stored XSS that spread to over a million MySpace profiles in under a day, each infected profile re-serving the script to everyone who viewed it.
+The fix is the same idea both times: keep **data** and **code** apart so input can never cross the line into either. For SQL that means **parameterized (prepared) queries** — the query structure is fixed up front and your input is sent separately as a value, so a quote is just a quote. For HTML it means **output encoding / context-aware escaping** — `<` becomes `&lt;` at the moment of printing, so a script tag renders as visible text instead of executing. This is not a fringe bug: injection led the OWASP Top 10 for years and is still on the list, with cross-site scripting now counted in the same category. And it scales — the Samy worm was a stored XSS that spread to over a million MySpace profiles in under a day, each infected profile re-serving the script to everyone who viewed it.
 
 ```mermaid
 flowchart LR
@@ -133,7 +133,7 @@ hashcat -m 0 hash.txt --show
 
 Now prove **stored XSS**, where DVWA saves the payload in its guestbook and runs it whenever someone opens that page.
 
-2. Open a second terminal and start **netcat** (`nc`) as a listener on TCP port 8000. Leave it running:
+2. In the terminal you are recording, start **netcat** (`nc`) as a listener on TCP port 8000 and leave it running. That way the stolen cookie arrives inside your recording:
 
 ```bash
 nc -lvnp 8000
@@ -197,7 +197,7 @@ Medium has not removed the vulnerability; it has only blacklisted a few strings.
 
 **In the report:** screenshots of the Medium SQLi and Medium reflected XSS results (plus the stored XSS if you did the bonus), and 3–5 sentences explaining what each filter tried to block and why the bypass worked.
 
-## Part 2 — Defensive: fix the code · ~30 min
+## Part 2 — Defensive: fix the code · ~35 min
 
 ### 2.1 Find the root cause
 At the bottom right of each module click **View Source**, then **Compare All Levels**. In the **Low** code, point to the exact line where input is **concatenated into the SQL query** (SQL Injection: the line that builds `$query`) and where it is **printed without encoding** into HTML (XSS (Reflected): the line that adds `$_GET[ 'name' ]` to the page).
@@ -212,7 +212,18 @@ The **Impossible** level in *Compare All Levels* is DVWA's own correct version �
 - **SQL:** the fixed query as a **parameterized / prepared statement** (snippet).
 - **XSS:** output encoding/escaping of the user input (mention input validation and `Content-Security-Policy`).
 
-### 2.3 Recommendations
+### 2.3 Prove the fix
+The **Impossible** level runs the fixed code, so attack it. Open **DVWA Security**, choose **Impossible**, click **Submit**, then repeat your Low attacks:
+
+1. **SQL Injection:** submit `1`, then both payloads from 1.1.
+2. **XSS (Reflected):** submit the payload from 1.2.
+
+> [!NOTE]
+> **Expected.** `1` still returns one user, but both SQL payloads return nothing: the fixed code accepts only a number and hands it to the query as a bound value, so your quote never becomes SQL. The XSS payload appears on the page as plain text, `Hello <script>alert(document.cookie)</script>`, and no alert opens.
+
+**In the report:** screenshots of both results on Impossible, with one sentence each on why the same input is now harmless.
+
+### 2.4 Recommendations
 3 concrete secure-development recommendations (parameterized queries everywhere, context-aware output encoding, CSP, least privilege for the DB user).
 
 ### Bonus
@@ -222,7 +233,7 @@ The **Impossible** level in *Compare All Levels* is DVWA's own correct version �
 
 ## Submission
 
-- `lab04_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, write-up.
+- `lab04_<ID>.pdf` — payloads, extracted data, XSS screenshot with your ID, fixed code snippets, the results on Impossible, write-up.
 - An **[asciinema](https://asciinema.org/) recording** of your work (`asciinema rec lab.cast`, stop with `Ctrl-D`) — required; your ID in the XSS screenshot only shows whose work it is, this recording is the proof of work.
 
 ## Grading
