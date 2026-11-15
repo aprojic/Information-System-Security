@@ -21,17 +21,36 @@
 
 ## Preduvjeti
 
-- [ ] Odrađene Vježbe 00–05.
+- [ ] Odrađene Vježbe 00–06.
 - [ ] `make_incident.py` (u ovoj mapi) i `ISS_SECRET` (daje nastavnik) — generiraš svoj `incident.log`.
 - [ ] Alati za tekst (`grep`, `awk`, `sort`, `base64`) i preglednik.
 
 ## Priprema · ~5 min
 
+Radiš u istom repozitoriju kao u Vježbi 06. Ažuriraj ga i uđi u mapu ove vježbe. Ako trgovina iz Vježbe 05 još radi, zaustavi je: ova vježba pokreće vlastitu kopiju na istom portu 3000.
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-07-ctf
+docker compose -f ../lab-05-web-auth/compose.yml down
+```
+
+Pokreni snimanje svog rada (obavezno za predaju). Sve što upišeš u ovaj terminal snima se dok na kraju vježbe ne pritisneš `Ctrl-D`; nakon toga zaustavi metu s `docker compose down`:
+
+```bash
+asciinema rec vjezba.cast
+```
+
+Podigni metu, isti **OWASP Juice Shop** kao u Vježbi 05:
+
 ```bash
 docker compose up -d
 ```
 
-Otvori `http://localhost:3000` i **registriraj račun s e-mailom koji sadrži tvoj matični broj**.
+Pričekaj desetak sekundi, otvori `http://localhost:3000` u Firefoxu i **registriraj račun s e-mailom `<MB>@flicker.test`** (tvoj matični broj), kao u Vježbi 05, pa se prijavi.
+
+> [!TIP]
+> **Čest problem.** `port is already allocated` znači da još radi neki drugi Juice Shop: ponovno pokreni redak `docker compose -f ../lab-05-web-auth/compose.yml down`. `no configuration file provided` znači da nisi u mapi `lab-07-ctf`.
 
 ## Pozadina — kako pristupiti u minuti
 
@@ -54,14 +73,14 @@ flowchart LR
 Pronađi *Score Board* i riješi **najmanje 4 izazova iz barem 3 kategorije** (npr. injection, XSS, broken access control, sensitive data). Za svaki: naziv, kategorija, kratak opis. **U izvještaj:** screenshot Score Boarda s riješenim izazovima i tvojim računom.
 
 > [!TIP]
-> Ne moraš provaliti sve — biraj izazove iz područja koja smo radili (Vježbe 03 i 04). Kreni od lakših.
+> Ne moraš provaliti sve — biraj izazove iz područja koja smo radili (Vježbe 04 i 05). Kreni od lakših.
 
 ## Dio 2 — Plavi tim: analiza incidenta · ~40 min
 
 Prvo generiraj **svoj** zapisnik (flag je vezan uz tvoj matični broj):
 
 ```bash
-ISS_SECRET=<od nastavnika> python make_incident.py <tvoj matični broj>
+ISS_SECRET=<od nastavnika> python3 make_incident.py <tvoj matični broj>
 ```
 
 ### 2.1 Tko i odakle

@@ -21,17 +21,36 @@
 
 ## Prerequisites
 
-- [ ] Labs 00–05 completed.
+- [ ] Labs 00–06 completed.
 - [ ] `make_incident.py` (in this folder) and `ISS_SECRET` (from the instructor) — you generate your own `incident.log`.
 - [ ] Text tools (`grep`, `awk`, `sort`, `base64`) and a browser.
 
 ## Setup · ~5 min
 
+You work in the same repository as in Lab 06. Update it and go into this lab's folder. If the Lab 05 shop is still running, stop it: this lab starts its own copy on the same port 3000.
+
+```bash
+cd ~/Information-System-Security && git pull
+cd lab-07-ctf
+docker compose -f ../lab-05-web-auth/compose.yml down
+```
+
+Start recording your work (required for the submission). Everything you type in this terminal is recorded until you press `Ctrl-D` at the end of the lab; after that, stop the target with `docker compose down`:
+
+```bash
+asciinema rec lab.cast
+```
+
+Bring up the target, the same **OWASP Juice Shop** as in Lab 05:
+
 ```bash
 docker compose up -d
 ```
 
-Open `http://localhost:3000` and **register an account with an email containing your student ID**.
+Wait about 10 seconds, open `http://localhost:3000` in Firefox and **register an account with the email `<ID>@flicker.test`** (your student ID), as in Lab 05, then log in.
+
+> [!TIP]
+> **Common pitfall.** `port is already allocated` means another Juice Shop is still running: run the `docker compose -f ../lab-05-web-auth/compose.yml down` line again. `no configuration file provided` means you are not in `lab-07-ctf`.
 
 ## Background — how to approach this in one minute
 
@@ -54,14 +73,14 @@ flowchart LR
 Find the *Score Board* and solve **at least 4 challenges from at least 3 categories** (e.g. injection, XSS, broken access control, sensitive data). For each: name, category, short description. **In the report:** a Score Board screenshot showing the solved challenges and your student-ID account.
 
 > [!TIP]
-> You don't need to break everything — pick challenges from the areas we covered (Labs 03 & 04). Start with the lower-star ones.
+> You don't need to break everything — pick challenges from the areas we covered (Labs 04 & 05). Start with the lower-star ones.
 
 ## Part 2 — Blue team: incident analysis · ~40 min
 
 First generate **your** log (the flag is tied to your student ID):
 
 ```bash
-ISS_SECRET=<from instructor> python make_incident.py <your ID>
+ISS_SECRET=<from instructor> python3 make_incident.py <your ID>
 ```
 
 ### 2.1 Who and from where

@@ -1,7 +1,7 @@
-# Lab 07 — meta za CTF dio: OWASP Juice Shop.
-# Pokretanje (u Kaliju):  docker compose up -d   →  http://localhost:3000
-# Zaustavljanje:          docker compose down
-# incident.log (plavi tim) je u ovoj mapi / na Merlinu — ne treba Docker.
+# Lab 07 — target for the CTF part: OWASP Juice Shop.
+# Start (in Kali):  docker compose up -d   →  http://localhost:3000
+# Stop:             docker compose down
+# The blue-team part needs no Docker: make_incident.py in this folder writes your incident.log.
 services:
   juiceshop:
     image: bkimminich/juice-shop:v20.2.0

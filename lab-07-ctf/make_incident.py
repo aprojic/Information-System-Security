@@ -1,9 +1,10 @@
-"""Lab 07 — generira TVOJ incident.log iz tvog matičnog broja.
+"""Lab 07 — generates YOUR incident.log from your student ID.
 
-    ISS_SECRET='<daje nastavnik>' python make_incident.py <maticni_broj>
+    ISS_SECRET='<from the instructor>' python3 make_incident.py <student-id>
 
-Flag skriven u logu (Base64 u zahtjevu za izvoz) izveden je iz tvog matičnog
-broja, pa je jedinstven. Nakon generiranja analiziraj `incident.log` po uputama.
+The flag hidden in the log (Base64 in the export request) is derived from your
+student ID, so it is unique. After generating it, analyse `incident.log` as the
+lab describes.
 """
 import base64
 import hashlib
@@ -12,11 +13,11 @@ import os
 import sys
 
 if len(sys.argv) != 2:
-    sys.exit("usage: ISS_SECRET=... python make_incident.py <maticni_broj>")
+    sys.exit("usage: ISS_SECRET=... python3 make_incident.py <student-id>")
 MB = sys.argv[1]
 SECRET = os.environ.get("ISS_SECRET")
 if not SECRET:
-    sys.exit("error: postavi ISS_SECRET (daje nastavnik)")
+    sys.exit("error: set ISS_SECRET (from the instructor)")
 
 hex6 = hmac.new(SECRET.encode(), f"lab07:{MB}".encode(), hashlib.sha256).hexdigest()[:6]
 flag = f"ASPIRA{{sis_incident_{hex6}}}"
@@ -45,4 +46,4 @@ lines += [
 
 with open("incident.log", "w") as f:
     f.write("\n".join(lines) + "\n")
-print(f"OK: incident.log ({len(lines)} redaka). Analiziraj ga po uputama.")
+print(f"OK: incident.log written ({len(lines)} lines). Analyse it as the lab describes.")
