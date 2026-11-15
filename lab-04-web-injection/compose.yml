@@ -5,7 +5,9 @@
 # DVWA image nema bazu, pa uz nju ide MariaDB (isto kao službeni DVWA compose).
 services:
   dvwa:
-    image: ghcr.io/digininja/dvwa:latest
+    # Pinned by digest: DVWA publishes only `latest`, and that tag once changed between two labs.
+    # To update: docker buildx imagetools inspect ghcr.io/digininja/dvwa:latest  (use the top-level Digest), then re-test both labs.
+    image: ghcr.io/digininja/dvwa@sha256:8029450682bd70e2e8cd1ffe8e46dd1885ff2a913296091cebfa8ba0a7d36498
     environment:
       DB_SERVER: db
     depends_on:
