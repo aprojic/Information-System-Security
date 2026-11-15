@@ -70,38 +70,92 @@ flowchart LR
 
 ## Dio 1 — Crveni tim: CTF · ~40 min
 
-Pronađi *Score Board* i riješi **najmanje 4 izazova iz barem 3 kategorije** (npr. injection, XSS, broken access control, sensitive data). Za svaki: naziv, kategorija, kratak opis. **U izvještaj:** screenshot Score Boarda s riješenim izazovima i tvojim računom.
+Pronađi *Score Board* i riješi **najmanje 4 nova izazova iz barem 3 kategorije** (npr. injection, XSS, broken access control, sensitive data). Za svaki: naziv, kategorija, kratak opis. **U izvještaj:** screenshot Score Boarda s riješenim izazovima i tvojim računom.
+
+Juice Shop pamti napredak u kolačiću preglednika, pa izazovi iz Vježbe 05 mogu već biti označeni kao riješeni kad otvoriš trgovinu. Oni se ovdje ne broje: *Score Board*, *View Basket* i sve ostalo iz tvog izvještaja za Vježbu 05. Četiri nova navedi poimence.
 
 > [!TIP]
 > Ne moraš provaliti sve — biraj izazove iz područja koja smo radili (Vježbe 04 i 05). Kreni od lakših.
 
 ## Dio 2 — Plavi tim: analiza incidenta · ~40 min
 
-Prvo generiraj **svoj** zapisnik (flag je vezan uz tvoj matični broj):
+Flickerovom partneru provaljeno je u sustav, pa ti je poslao jednodnevni pristupni zapisnik (access log) svoje web trgovine. Generiraj **svoj** primjerak: adresa napadača, broj pokušaja, vremena i flag u njemu vezani su uz tvoj matični broj. Zamijeni oba placeholdera; tajna je ista kao u Vježbi 06.
 
 ```bash
 ISS_SECRET=<od nastavnika> python3 make_incident.py <tvoj matični broj>
+head -3 incident.log
 ```
 
+> [!NOTE]
+> **Očekivano.** `OK: incident.log written (… lines)`, nekoliko tisuća redaka, a zatim prva tri.
+
+Svaki redak je jedan zahtjev. Slijeva nadesno: IP adresa klijenta, vrijeme, zahtjev (metoda i putanja), **statusni kod** kojim je poslužitelj odgovorio (`200` u redu, `302` preusmjeravanje, `401` pogrešna prijava, `403` zabranjeno, `404` nije pronađeno, `500` greška poslužitelja), veličina odgovora u bajtovima i softver klijenta. `awk` dijeli redak po razmacima, pa je adresa polje `$1`, putanja `$7`, status `$9`, a veličina `$10`.
+
 ### 2.1 Tko i odakle
+Prebroji zahtjeve po adresi:
+
 ```bash
 awk '{print $1}' incident.log | sort | uniq -c | sort -rn | head
 ```
-Odredi IP napadača (nesrazmjerno mnogo zahtjeva, puno grešaka 4xx/5xx).
+
+Najaktivnije adrese nisu napadač: servis za nadzor i crawler tražilice šalju više zahtjeva nego ijedna osoba. Napad je glasan na drugi način, proizvodi greške. Prebroji samo zahtjeve na koje je odgovoreno statusom 4xx ili 5xx:
+
+```bash
+awk '$9 >= 400 {print $1}' incident.log | sort | uniq -c | sort -rn | head
+```
+
+> [!NOTE]
+> **Očekivano.** Dvije adrese odskaču daleko iznad svih ostalih. To su tvoji osumnjičenici.
+
+Za svakog osumnjičenika ispiši statusne kodove koje je dobio (`<IP>` zamijeni adresom):
+
+```bash
+grep '^<IP> ' incident.log | awk '{print $9}' | sort | uniq -c
+```
+
+> [!NOTE]
+> **Očekivano.** Jedan je dobivao samo `404` i `403`: skener koji je pokucao na sva vrata i nijedna nisu bila otvorena. Drugi ima i `401`, `302` i `200`: taj je ušao i to je tvoj napadač.
 
 ### 2.2 Faze napada
-Poredaj kronološki: izviđanje (skeniranje putanja), pokušaji injectiona, uspješan pristup, iznošenje podataka. Za svaku fazu navedi primjer retka.
+Zahtjeve napadača izdvoji u zasebnu datoteku i čitaj ih odozgo prema dolje; zapisnik je poredan po vremenu. U `less` se krećeš strelicama, a izlaziš s `q`:
+
+```bash
+grep '^<IP> ' incident.log > attacker.log
+wc -l attacker.log
+less attacker.log
+```
+
+Pronađi četiri faze i zabilježi kad koja počinje: **izviđanje** (mnogo različitih putanja, gotovo sve s odgovorom `404`), **pokušaji injectiona** (`/search?q=` s `%27`, URL-kodiranim jednostrukim navodnikom iz Vježbe 04; prati kako status prelazi iz `500` u `200`), **pogađanje lozinke** (`POST /login` s odgovorom `401` iznova i iznova, a zatim jedan `302`) i **pristup s iznošenjem podataka** (stranice s odgovorom `200` nakon te prijave).
+
+Prebroji neuspjele prijave:
+
+```bash
+grep -c '"POST /login HTTP/1.1" 401' attacker.log
+```
+
+> [!NOTE]
+> **Očekivano.** Više od pet; točan broj je u zapisniku svakog studenta drukčiji.
 
 ### 2.3 Skriveni trag
-Zahtjev kojim su podaci izneseni nosi zakodiran parametar — dekodiraj ga:
+Nakon prijave napadač je iznio podatke. Iznošenje se vidi kao neobično velik odgovor, zato napadačeve uspješne zahtjeve poredaj po veličini:
+
 ```bash
-grep 'export' incident.log
+awk '$9 == 200 {print $10, $7}' attacker.log | sort -rn | head -3
+```
+
+> [!NOTE]
+> **Očekivano.** Daleko najveći je zahtjev na `/export` s dugom vrijednošću `data=`. I zaposlenici koriste `/export`, ali s `format=csv`.
+
+Ta je vrijednost Base64. Dekodiraj je (zalijepi je između navodnika):
+
+```bash
 echo '<zakodirana_vrijednost>' | base64 -d
 ```
-> [!NOTE]
-> **Očekivano.** Base64 vrijednost dekodira se u flag oblika `ASPIRA{sis_incident_...}`.
 
-**U izvještaj:** IP napadača, tablica faza s primjerima redaka, dekodirani flag, i popis **IOC-ova**.
+> [!NOTE]
+> **Očekivano.** Flag oblika `ASPIRA{sis_incident_...}`.
+
+**U izvještaj:** IP napadača, drugi osumnjičenik i zašto si ga isključio, tablica faza s vremenom početka i po jednim primjerom retka, broj neuspjelih prijava, dekodirani flag i popis **IOC-ova** (indikatori kompromitacije: konkretni tragovi koje bi drugi branitelj mogao potražiti u svojim zapisnicima, poput adrese, softvera klijenta, putanja i vremena).
 
 ### 2.4 Odgovor na incident
 Kratko (5–7 rečenica): **zadržavanje, čišćenje, oporavak**, te što bi spriječilo ponavljanje.
@@ -119,7 +173,7 @@ Kratko (5–7 rečenica): **zadržavanje, čišćenje, oporavak**, te što bi sp
 
 | Stavka | Bodovi |
 |---|:-:|
-| CTF: ≥ 4 izazova iz ≥ 3 kategorije (s opisima) | 4 |
+| CTF: ≥ 4 nova izazova iz ≥ 3 kategorije (s opisima) | 4 |
 | Analiza: IP napadača + faze napada | 3 |
 | Dekodiran flag + popis IOC-ova | 2 |
 | Plan odgovora na incident | 1 |

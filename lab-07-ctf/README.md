@@ -70,38 +70,92 @@ flowchart LR
 
 ## Part 1 — Red team: CTF · ~40 min
 
-Find the *Score Board* and solve **at least 4 challenges from at least 3 categories** (e.g. injection, XSS, broken access control, sensitive data). For each: name, category, short description. **In the report:** a Score Board screenshot showing the solved challenges and your student-ID account.
+Find the *Score Board* and solve **at least 4 new challenges from at least 3 categories** (e.g. injection, XSS, broken access control, sensitive data). For each: name, category, short description. **In the report:** a Score Board screenshot showing the solved challenges and your student-ID account.
+
+Juice Shop keeps your progress in a browser cookie, so challenges from Lab 05 may already be marked as solved when you open the shop. Those do not count here: *Score Board*, *View Basket* and anything else from your Lab 05 report. List the four new ones by name.
 
 > [!TIP]
 > You don't need to break everything — pick challenges from the areas we covered (Labs 04 & 05). Start with the lower-star ones.
 
 ## Part 2 — Blue team: incident analysis · ~40 min
 
-First generate **your** log (the flag is tied to your student ID):
+A partner of Flicker's was breached and sent you one day of their web shop's access log. Generate **your** copy: the attacker's address, the number of attempts, the times and the flag in it are tied to your student ID. Replace both placeholders; the secret is the one from Lab 06.
 
 ```bash
 ISS_SECRET=<from instructor> python3 make_incident.py <your ID>
+head -3 incident.log
 ```
 
+> [!NOTE]
+> **Expected.** `OK: incident.log written (… lines)`, a few thousand of them, then the first three.
+
+Each line is one request. From left to right: the client's IP address, the time, the request (method and path), the **status code** the server answered with (`200` OK, `302` redirect, `401` wrong login, `403` forbidden, `404` not found, `500` server error), the size of the answer in bytes and the client's software. `awk` splits a line on spaces, which makes the address field `$1`, the path `$7`, the status `$9` and the size `$10`.
+
 ### 2.1 Who and from where
+Count the requests per address:
+
 ```bash
 awk '{print $1}' incident.log | sort | uniq -c | sort -rn | head
 ```
-Determine the attacker's IP (disproportionately many requests, lots of 4xx/5xx).
+
+The busiest addresses are not the attacker: a monitoring service and a search engine's crawler send more requests than any person. An attack is loud in a different way, it produces errors. Count only the requests that were answered with a 4xx or 5xx status:
+
+```bash
+awk '$9 >= 400 {print $1}' incident.log | sort | uniq -c | sort -rn | head
+```
+
+> [!NOTE]
+> **Expected.** Two addresses stand far above all the others. They are your suspects.
+
+For each suspect, list the status codes it received (replace `<IP>` with the address):
+
+```bash
+grep '^<IP> ' incident.log | awk '{print $9}' | sort | uniq -c
+```
+
+> [!NOTE]
+> **Expected.** One suspect received nothing but `404` and `403`: a scanner that tried every door and found none open. The other one also has `401`, `302` and `200`: that one got in, and it is your attacker.
 
 ### 2.2 Attack phases
-Order them chronologically: reconnaissance (path scanning), injection attempts, successful access, data exfiltration. Cite an example line per phase.
+Put the attacker's requests into a file of their own and read them from top to bottom; the log is ordered by time. In `less`, scroll with the arrow keys and leave with `q`:
+
+```bash
+grep '^<IP> ' incident.log > attacker.log
+wc -l attacker.log
+less attacker.log
+```
+
+Find the four phases and note when each one starts: **reconnaissance** (many different paths, nearly all answered `404`), **injection attempts** (`/search?q=` with `%27`, the URL-encoded single quote from Lab 04; watch the status turn from `500` to `200`), **password guessing** (`POST /login` answered `401` again and again, then a single `302`) and **access with exfiltration** (pages answered `200` after that login).
+
+Count the failed logins:
+
+```bash
+grep -c '"POST /login HTTP/1.1" 401' attacker.log
+```
+
+> [!NOTE]
+> **Expected.** More than five; the exact number is different in every student's log.
 
 ### 2.3 The hidden trace
-The exfiltration request carries an encoded parameter — decode it:
+After logging in, the attacker took data out. Exfiltration shows up as an unusually large answer, so sort the attacker's successful requests by size:
+
 ```bash
-grep 'export' incident.log
+awk '$9 == 200 {print $10, $7}' attacker.log | sort -rn | head -3
+```
+
+> [!NOTE]
+> **Expected.** By far the largest is an `/export` request with a long `data=` value. Staff use `/export` too, but with `format=csv`.
+
+That value is Base64. Decode it (paste it between the quotes):
+
+```bash
 echo '<encoded_value>' | base64 -d
 ```
-> [!NOTE]
-> **Expected.** The Base64 value decodes to a flag of the form `ASPIRA{sis_incident_...}`.
 
-**In the report:** the attacker's IP, a table of phases with example lines, the decoded flag, and a list of **IOCs**.
+> [!NOTE]
+> **Expected.** A flag of the form `ASPIRA{sis_incident_...}`.
+
+**In the report:** the attacker's IP, the other suspect and why you ruled it out, a table of the phases with start time and one example line each, the number of failed logins, the decoded flag, and a list of **IOCs** (indicators of compromise: the concrete traces another defender could search their own logs for, such as the address, the client software, the paths and the times).
 
 ### 2.4 Incident response
 Briefly (5–7 sentences): **containment, eradication, recovery**, and what would prevent a recurrence.
@@ -119,7 +173,7 @@ Briefly (5–7 sentences): **containment, eradication, recovery**, and what woul
 
 | Item | Points |
 |---|:-:|
-| CTF: ≥ 4 challenges from ≥ 3 categories (with descriptions) | 4 |
+| CTF: ≥ 4 new challenges from ≥ 3 categories (with descriptions) | 4 |
 | Analysis: attacker IP + attack phases | 3 |
 | Decoded flag + IOC list | 2 |
 | Incident response plan | 1 |
