@@ -3,7 +3,7 @@
 <!-- kicker: Vježba 08 · napadni pa obrani · Sigurnost informacijskih sustava -->
 # Vježba 08 — Sigurnost AI sustava: prompt injection
 
-*Aplikacije s jezičnim modelima imaju novu napadnu površinu: sam unos. Izvuci tajnu iz chatbota riječima, pa pokaži zašto je filtar na izlazu krpa, a ne lijek.*
+*Aplikacije s jezičnim modelima imaju novu napadnu površinu: sam unos. Izvuci tajnu iz chatbota riječima, pa pokaži zašto je filtar na izlazu zakrpa, a ne lijek.*
 
 `~90 min` · `Kali · Docker · Ollama (lokalni LLM)` · `razina: napredna` · `predaja: Merlin`
 
@@ -16,7 +16,7 @@
 
 - Razumjeti prompt injection i zašto se sistemski prompt ne smije smatrati tajnom.
 - Izvući skrivenu tajnu iz LLM aplikacije, prvo izravnim pitanjem, a zatim zadatkom koji tajnu iznese van.
-- Pokazati da je naivni izlazni filtar zaobilazan.
+- Pokazati da se naivni izlazni filtar može zaobići.
 - Objasniti ispravne obrane (OWASP LLM Top 10) i načelo "ne stavljaj tajne u prompt".
 
 ## Preduvjeti
@@ -149,7 +149,7 @@ Natjeraj model da tajnu napiše u bilo kojem obliku osim točnog izvornog, primj
 **U izvještaj:** pokaži da filtar zaobilaziš tako da model tajnu **ne ispiše doslovno**, pa je sam sastaviš. Priloži poruku, odgovor i sastavljeni flag.
 
 ### 2.3 Prava obrana
-**U izvještaj:** objasni (5–7 rečenica) zašto je filtar samo krpa i što je ispravno (poveži s OWASP LLM Top 10: LLM01 i LLM07):
+**U izvještaj:** objasni (5–7 rečenica) zašto je filtar samo zakrpa i što je ispravno (poveži s OWASP LLM Top 10: LLM01 i LLM07):
 - **Ne stavljaj tajne/ovlasti u prompt** — autorizaciju provodi sustav izvan modela.
 - **Najmanje ovlasti za alate** koje model smije pozvati; čovjek u petlji za osjetljive radnje.
 - **Validacija ulaza i izlaza** kao dubinska obrana, ne jedina.
